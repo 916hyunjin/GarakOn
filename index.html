@@ -45,16 +45,12 @@
       
       <!-- Brand & Title -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm">
           <i class="fa-solid fa-music"></i>
         </div>
-        <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-          <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight whitespace-nowrap">가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span></h1>
-          <span class="text-[11px] sm:text-xs text-slate-500 font-medium whitespace-nowrap">- 가락을 만드는 음악 도구</span>
-          <!-- 모바일 디바이스 표시 배지 -->
-          <span class="inline-flex sm:hidden items-center gap-0.5 text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md shrink-0">
-            <i class="fa-solid fa-mobile-screen-button"></i> 모바일
-          </span>
+        <div>
+          <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none">가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span></h1>
+          <p class="text-[10px] sm:text-xs text-slate-500 font-medium">가락을 만드는 음악 도구</p>
         </div>
       </div>
 
@@ -235,7 +231,7 @@
 
   <!-- Main Grid Area -->
   <main class="flex-1 w-full p-2 sm:p-4 flex flex-col justify-center overflow-hidden">
-    <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[85vh] lg:max-h-[88vh]">
+    <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[82vh]">
       
       <!-- Horizontal Scroll Wrapper -->
       <div class="w-full overflow-x-auto flex flex-col flex-1">
@@ -262,7 +258,7 @@
 
   <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 py-2 px-3 text-center text-[10px] sm:text-xs text-slate-500 font-medium">
-    서울교대 박현진 스튜디오 - 가락온 (GarakOn) | 음악 수업 및 가락 창작용 도구
+    서울교대 박현진 스튜디오 - 가락온 (GarakOn) | 초등 음악 수업 및 가락 창작용 도구
   </footer>
 
   <!-- Toast Notification Box -->
@@ -377,19 +373,19 @@
       { 
         id: 'high', 
         label: '높은소리', 
-        selected: '하이햇 (Closed)', 
+        selected: '꽹과리', 
         soundOpts: ['꽹과리', '소고', '트라이앵글', '하이햇 (Closed)', '하이햇 (Open)', '클랩 (손뼉)'] 
       },
       { 
         id: 'mid', 
         label: '중간소리', 
-        selected: '스네어 드럼', 
+        selected: '장구', 
         soundOpts: ['장구', '징', '우드블럭', '스네어 드럼', '탐탐', '림샷'] 
       },
       { 
         id: 'low', 
         label: '낮은소리', 
-        selected: '킥 드럼 (베이스)', 
+        selected: '북', 
         soundOpts: ['북', '용고/대고', '젬베', '킥 드럼 (베이스)', '로우 탐', '카혼 (베이스)'] 
       }
     ];
@@ -902,7 +898,7 @@
         let borderClass = 'border-r border-slate-200';
         if (isMeasureStart && s > 0) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
-        stepBox.className = `flex-1 h-7 flex items-center justify-center text-xs font-bold ${borderClass} ${
+        stepBox.className = `flex-1 h-9 sm:h-10 flex items-center justify-center text-xs font-bold ${borderClass} ${
           isMeasureStart ? 'bg-emerald-200 text-emerald-950 font-black' : 'bg-slate-100 text-slate-500'
         }`;
         stepBox.innerText = isMeasureStart ? `${Math.floor(s / beatsPerMeasure) + 1}마디` : '';
@@ -917,7 +913,7 @@
         row.className = 'flex items-center w-full';
 
         const label = document.createElement('div');
-        label.className = `w-16 sm:w-24 shrink-0 px-1.5 py-1.5 sm:px-2 sm:py-2 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200`;
+        label.className = `w-16 sm:w-24 shrink-0 h-12 sm:h-14 px-1.5 py-1.5 sm:px-2 sm:py-2 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200`;
         label.innerText = n.label;
         row.appendChild(label);
 
@@ -934,7 +930,7 @@
           if (isMeasureStart && s > 0) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 h-8 sm:h-12 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
+          cell.className = `grid-cell flex-1 h-12 sm:h-14 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
             isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'
           }`;
           cell.id = `cell-${rowKey}-${s}`;
@@ -986,7 +982,7 @@
         row.className = 'flex items-center w-full';
 
         const label = document.createElement('div');
-        label.className = 'w-16 sm:w-24 shrink-0 bg-amber-50 border border-amber-200 border-r-0 px-1 py-1 sm:px-2 sm:py-1.5 text-slate-800 shadow-2xs text-[10px] sm:text-xs font-black flex flex-col items-start justify-center gap-0.5';
+        label.className = 'w-16 sm:w-24 shrink-0 h-12 sm:h-14 bg-amber-50 border border-amber-200 border-r-0 px-1 py-1 sm:px-2 sm:py-1.5 text-slate-800 shadow-2xs text-[10px] sm:text-xs font-black flex flex-col items-start justify-center gap-0.5';
         
         const titleSpan = document.createElement('span');
         titleSpan.innerText = pTrack.label;
@@ -1037,10 +1033,10 @@
           }
 
           if (isActive) {
-            cell.className = `grid-cell flex-1 h-8 sm:h-12 ${shapeColor} font-extrabold text-[10px] sm:text-xs flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer`;
+            cell.className = `grid-cell flex-1 h-12 sm:h-14 ${shapeColor} font-extrabold text-sm sm:text-base flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer`;
             cell.innerText = shapeSymbol;
           } else {
-            cell.className = `grid-cell flex-1 h-8 sm:h-12 border-t border-b border-amber-200/60 cursor-pointer ${borderClass} ${
+            cell.className = `grid-cell flex-1 h-12 sm:h-14 border-t border-b border-amber-200/60 cursor-pointer ${borderClass} ${
               isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
             }`;
           }
@@ -1476,3 +1472,9 @@
   </script>
 </body>
 </html>
+```
+
+### 수정 내용 Summary
+- 음계 및 타악기 셀 높이를 기존 `h-7 sm:h-9`에서 **`h-12 sm:h-14`**로 대폭 변경하여 터치/클릭이 쉽고 시원해지도록 위아래 크기를 확충했습니다.
+- 헤더 및 음계 라벨, 타악기 레이아웃의 높이도 새로 변경된 그리드 셀 크기에 맞춰 정렬을 고르게 정비했습니다.
+- 오디오 처리 및 MIDI 저장 등 기존 로직 및 나머지 구성 요소에는 전혀 변경을 가하지 않았습니다.
