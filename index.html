@@ -42,7 +42,7 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-3 py-2 shadow-2xs">
     <div class="max-w-full mx-auto flex items-center justify-between gap-2">
       
-      <!-- Brand & Title -->
+      <!-- Brand & Title & Mobile Settings Toggle -->
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
           <i class="fa-solid fa-music"></i>
@@ -51,9 +51,14 @@
           <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none">가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span></h1>
           <p class="text-[10px] sm:text-xs text-slate-500 font-medium">가락을 만드는 음악 도구</p>
         </div>
+
+        <!-- Mobile Toggle Settings Button -->
+        <button id="mobileSettingsToggleBtn" class="lg:hidden flex items-center justify-center p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-xl transition-all cursor-pointer touch-manipulation ml-1">
+          <i class="fa-solid fa-sliders text-sm"></i>
+        </button>
       </div>
 
-      <!-- Quick Action Controls & Mobile Settings Toggle -->
+      <!-- Quick Action Controls -->
       <div class="flex items-center gap-1.5 sm:gap-3">
         <!-- Play / Stop -->
         <button id="playBtn" class="flex items-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
@@ -110,11 +115,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Mobile Toggle Settings Button -->
-        <button id="mobileSettingsToggleBtn" class="lg:hidden flex items-center justify-center p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-xl transition-all cursor-pointer touch-manipulation">
-          <i class="fa-solid fa-sliders text-sm"></i>
-        </button>
 
         <span class="hidden xl:inline text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200">
           서울교대 박현진 스튜디오
@@ -188,7 +188,7 @@
           <span class="font-bold text-slate-500 text-[11px]">옥타브:</span>
           <select id="octaveSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="1">1옥타브 (C4~B4)</option>
-            <option value="2">2옥타브 (C3~B4)</option>
+            <option value="2">2옥타브 (C4~B5)</option>
             <option value="3">3옥타브 (C3~B5)</option>
             <option value="4">4옥타브 (C2~B5)</option>
           </select>
@@ -240,14 +240,15 @@
           <!-- Rendered dynamically -->
         </div>
 
-        <!-- Melodic Score Grid -->
-        <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100 overflow-y-auto smooth-scroll min-w-[650px] sm:min-w-[850px]">
-          <!-- Rendered dynamically -->
-        </div>
+        <!-- Combined Score & Percussion Grid -->
+        <div class="flex flex-col w-full overflow-y-auto smooth-scroll min-w-[650px] sm:min-w-[850px]">
+          <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100">
+            <!-- Rendered dynamically -->
+          </div>
 
-        <!-- Percussion Grid -->
-        <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 shrink-0 min-w-[650px] sm:min-w-[850px]">
-          <!-- Rendered dynamically -->
+          <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 border-t border-slate-200">
+            <!-- Rendered dynamically -->
+          </div>
         </div>
 
       </div>
@@ -257,7 +258,7 @@
 
   <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 py-2 px-3 text-center text-[10px] sm:text-xs text-slate-500 font-medium">
-    서울교대 박현진 스튜디오 - 가락온 (GarakOn) | 초등 음악 수업 및 가락 창작용 도구
+    서울교대 박현진 스튜디오 가락온
   </footer>
 
   <!-- Toast Notification Box -->
@@ -343,8 +344,15 @@
       if (currentOctaves === 1) return baseList;
 
       let fullList = [];
-      const startOct = 4 + Math.floor((currentOctaves - 1) / 2);
-      const endOct = startOct - currentOctaves + 1;
+      let startOct, endOct;
+
+      if (currentOctaves === 2) {
+        startOct = 5;
+        endOct = 4;
+      } else {
+        startOct = 4 + Math.floor((currentOctaves - 1) / 2);
+        endOct = startOct - currentOctaves + 1;
+      }
 
       for (let o = startOct; o >= endOct; o--) {
         baseList.forEach(n => {
