@@ -609,31 +609,61 @@
       const now = ctx.currentTime;
 
       if (currentInstrument === 'piano') {
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const gain1 = ctx.createGain();
-        const gain2 = ctx.createGain();
+        /* 더욱 풍성하고 진짜 아쿠스틱 피아노에 가까운 음색 합성 */
+        const oscFund = ctx.createOscillator();   // 근음 (Fundamental Sine)
+        const oscTri = ctx.createOscillator();    // 공명 배음 (Harmonic Triangle)
+        const oscHammer = ctx.createOscillator(); // 해머 타격 어택음 (Square Attack)
 
-        osc1.type = 'triangle';
-        osc2.type = 'sine';
-        osc1.frequency.setValueAtTime(freq, now);
-        osc2.frequency.setValueAtTime(freq * 2, now);
+        const gainFund = ctx.createGain();
+        const gainTri = ctx.createGain();
+        const gainHammer = ctx.createGain();
 
-        gain1.gain.setValueAtTime(0.6, now);
-        gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);
+        // 1. 근음 파형 설정
+        oscFund.type = 'sine';
+        oscFund.frequency.setValueAtTime(freq, now);
 
-        gain2.gain.setValueAtTime(0.2, now);
-        gain2.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.9);
+        // 2. 공명 배음 설정 (풍부한 2차 배음)
+        oscTri.type = 'triangle';
+        oscTri.frequency.setValueAtTime(freq * 2, now);
 
-        osc1.connect(gain1);
-        osc2.connect(gain2);
-        gain1.connect(ctx.destination);
-        gain2.connect(ctx.destination);
+        // 3. 건반 해머가 현을 때리는 순간의 타격음 설정
+        oscHammer.type = 'square';
+        oscHammer.frequency.setValueAtTime(freq * 4, now);
 
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + duration * 1.6);
-        osc2.stop(now + duration * 1.6);
+        // 피아노 울림통 저음역 필터
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(freq * 3.5, now);
+        filter.frequency.exponentialRampToValueAtTime(freq * 1.5, now + duration * 1.5);
+
+        // 음량 감쇠 (Envelope) 설정 - 어택 이후 피아노 특유의 서스테인/릴리즈
+        gainFund.gain.setValueAtTime(0.7, now);
+        gainFund.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.0));
+
+        gainTri.gain.setValueAtTime(0.25, now);
+        gainTri.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.8, duration * 1.5));
+
+        // 해머 타격음은 초반 0.03초 동안 짧고 날카롭게 울림
+        gainHammer.gain.setValueAtTime(0.12, now);
+        gainHammer.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+        oscFund.connect(gainFund);
+        oscTri.connect(gainTri);
+        oscHammer.connect(gainHammer);
+
+        gainFund.connect(filter);
+        gainTri.connect(filter);
+        gainHammer.connect(filter);
+
+        filter.connect(ctx.destination);
+
+        oscFund.start(now);
+        oscTri.start(now);
+        oscHammer.start(now);
+
+        oscFund.stop(now + Math.max(1.2, duration * 2.0));
+        oscTri.stop(now + Math.max(0.8, duration * 1.5));
+        oscHammer.stop(now + 0.04);
         return;
       } 
       
@@ -641,32 +671,47 @@
       const gain = ctx.createGain();
 
       if (currentInstrument === 'strings') {
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
+        /* 풍성하고 부드러운 바이올린/첼로 현악 앙상블 음색 */
+        const numOscs = 4;
+        const detunes = [-7, -2.5, 3, 7.5]; // 4개의 현이 미세하게 떨리는 앙상블 효과
+        const masterGain = ctx.createGain();
+
+        // 바이올린 특유의 미세한 떨림 (Vibrato LFO)
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.frequency.setValueAtTime(5.5, now); // 5.5Hz 비브라토 속도
+        lfoGain.gain.setValueAtTime(freq * 0.012, now); // 떨림 폭
+
+        // 목재 울림통을 모사하는 따뜻한 Lowpass 필터
         const filter = ctx.createBiquadFilter();
-
-        osc1.type = 'sawtooth';
-        osc2.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(freq, now);
-        osc2.frequency.setValueAtTime(freq * 1.004, now);
-
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(freq * 3.5, now);
+        filter.frequency.setValueAtTime(freq * 2.2, now);
+        filter.frequency.linearRampToValueAtTime(freq * 3.2, now + 0.25); // 활을 켤 때 부드럽게 퍼짐
+        filter.Q.setValueAtTime(1.2, now);
 
-        gain.gain.setValueAtTime(0.01, now);
-        gain.gain.linearRampToValueAtTime(0.4, now + 0.15);
-        gain.gain.setValueAtTime(0.4, now + duration * 0.7);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1.5);
+        for (let i = 0; i < numOscs; i++) {
+          const oscEns = ctx.createOscillator();
+          oscEns.type = (i % 2 === 0) ? 'sawtooth' : 'triangle'; // 톱니파와 삼각파의 부드러운 조화
+          oscEns.frequency.setValueAtTime(freq, now);
+          oscEns.detune.setValueAtTime(detunes[i], now);
 
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
+          lfo.connect(oscEns.frequency);
+          oscEns.connect(filter);
+          oscEns.start(now);
+          oscEns.stop(now + duration * 1.6);
+        }
 
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + duration * 1.5);
-        osc2.stop(now + duration * 1.5);
+        lfo.start(now);
+        lfo.stop(now + duration * 1.6);
+
+        // 활을 당길 때의 부드러운 어택(Attack)과 서스테인/릴리즈
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(0.28, now + 0.12);
+        masterGain.gain.setValueAtTime(0.28, now + duration * 0.8);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);
+
+        filter.connect(masterGain);
+        masterGain.connect(ctx.destination);
         return;
       } else if (currentInstrument === 'woodwind') {
         osc.type = 'sine';
