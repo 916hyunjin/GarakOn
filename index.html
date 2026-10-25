@@ -43,13 +43,17 @@
     <div class="max-w-full mx-auto flex items-center justify-between gap-2">
       
       <!-- Brand & Title & Mobile Settings Toggle -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
           <i class="fa-solid fa-music"></i>
         </div>
-        <div>
-          <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none">가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span></h1>
-          <p class="text-[10px] sm:text-xs text-slate-500 font-medium">가락을 만드는 음악 도구</p>
+        <div class="flex flex-col justify-center">
+          <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none whitespace-nowrap">
+            가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span>
+          </h1>
+          <p class="text-[10px] sm:text-xs text-slate-500 font-medium whitespace-nowrap leading-tight mt-0.5">
+            가락을 만드는 음악 도구
+          </p>
         </div>
 
         <!-- Mobile Toggle Settings Button -->
@@ -61,11 +65,11 @@
       <!-- Quick Action Controls -->
       <div class="flex items-center gap-1.5 sm:gap-3">
         <!-- Play / Stop -->
-        <button id="playBtn" class="flex items-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
-          <i class="fa-solid fa-play text-[10px] sm:text-xs"></i> <span>재생</span>
+        <button id="playBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
+          <i class="fa-solid fa-play text-xs"></i>
         </button>
-        <button id="stopBtn" class="flex items-center gap-1.5 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
-          <i class="fa-solid fa-square text-[10px] sm:text-xs"></i> <span class="hidden sm:inline">정지</span>
+        <button id="stopBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
+          <i class="fa-solid fa-square text-xs"></i>
         </button>
         <button id="clearBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-trash-can text-xs"></i>
@@ -115,10 +119,6 @@
             </button>
           </div>
         </div>
-
-        <span class="hidden xl:inline text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200">
-          서울교대 박현진 스튜디오
-        </span>
 
         <input type="file" id="jsonInput" class="hidden" accept=".garakon,.json">
       </div>
@@ -255,11 +255,6 @@
 
     </div>
   </main>
-
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 py-2 px-3 text-center text-[10px] sm:text-xs text-slate-500 font-medium">
-    서울교대 박현진 스튜디오 가락온
-  </footer>
 
   <!-- Toast Notification Box -->
   <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-3 py-2 sm:px-4 sm:py-3 rounded-xl shadow-lg text-xs font-medium transition-all opacity-0 pointer-events-none z-50 flex items-center gap-2">
@@ -1072,7 +1067,7 @@
       const playBtn = document.getElementById('playBtn');
       if (playBtn) {
         playBtn.classList.replace('bg-emerald-600', 'bg-amber-600');
-        playBtn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i> 일시정지';
+        playBtn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i>';
       }
 
       playbackLoop();
@@ -1099,7 +1094,7 @@
       const playBtn = document.getElementById('playBtn');
       if (playBtn) {
         playBtn.classList.replace('bg-amber-600', 'bg-emerald-600');
-        playBtn.innerHTML = '<i class="fa-solid fa-play text-xs"></i> 재생';
+        playBtn.innerHTML = '<i class="fa-solid fa-play text-xs"></i>';
       }
 
       document.querySelectorAll('[id^="step-head-"]').forEach(el => {
