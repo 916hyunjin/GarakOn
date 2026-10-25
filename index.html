@@ -1185,7 +1185,16 @@
             const clickX = e.clientX - rect.left;
             const fraction = Math.max(0, Math.min(0.99, clickX / rect.width));
             
-            const subOffset = Math.round(fraction * 4) * 0.25;
+            /* 초등학생을 위한 선택 음길이 기준 스마트 스냅 보정 */
+            let subOffset = 0;
+            if (selectedDuration === 0.25) {
+              subOffset = Math.round(fraction * 4) * 0.25;
+            } else if (selectedDuration === 0.5) {
+              subOffset = Math.round(fraction * 2) * 0.5;
+            } else {
+              subOffset = 0; // 4분음표 이상은 칸 안 어디를 눌러도 무조건 정박(0.0)에 딱 생성
+            }
+
             const targetStep = s + Math.min(0.75, subOffset);
 
             let existingKeyToToggle = null;
