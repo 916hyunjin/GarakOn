@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>가락온 (GarakOn) - 가락을 만들어요</title>
+  <title>가락온 (GarakOn) - 상상을 가락으로</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -15,14 +15,26 @@
       -webkit-tap-highlight-color: transparent;
     }
     .grid-cell {
-      transition: background-color 0.1s ease, transform 0.05s ease;
+      transition: background-color 0.1s ease;
       touch-action: manipulation;
     }
-    .grid-cell:active {
-      transform: scale(0.97);
+    /* 음표 클릭/생성 시 자석처럼 탁 붙는 스냅 애니메이션 */
+    @keyframes snapIn {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.6;
+      }
+      60% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
-    .grid-cell:hover {
-      filter: brightness(0.96);
+    .snap-note {
+      animation: snapIn 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -51,12 +63,16 @@
         <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
           <i class="fa-solid fa-music"></i>
         </div>
+        <!-- 헤더 문구 수정 (진한 회색 '상상을 가락으로') -->
         <div class="flex flex-col justify-center">
           <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-none whitespace-nowrap">
             가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span>
           </h1>
-          <p class="text-[10px] sm:text-xs text-slate-500 font-medium whitespace-nowrap leading-tight mt-0.5">
-            가락을 만들어요
+          <p class="text-xs sm:text-sm font-extrabold text-slate-700 whitespace-nowrap leading-tight mt-0.5">
+            상상을 가락으로
+          </p>
+          <p class="text-[9px] sm:text-[11px] text-slate-500 font-medium whitespace-nowrap leading-tight mt-0.5">
+            나만의 음악을 만들고, 기록하고, 표현하다.
           </p>
         </div>
 
@@ -75,6 +91,13 @@
         <button id="stopBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-square text-xs"></i>
         </button>
+
+        <!-- Loop Mode Toggle Button (1회 재생 / 계속 반복 선택) -->
+        <button id="loopToggleBtn" class="flex items-center gap-1 px-2 py-2 sm:px-3 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation border border-slate-200">
+          <i class="fa-solid fa-rotate-right text-slate-500 text-xs"></i>
+          <span id="loopModeText">1회 재생</span>
+        </button>
+
         <button id="clearBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-trash-can text-xs"></i>
         </button>
@@ -133,30 +156,103 @@
   <section id="controlsToolbar" class="bg-white border-b border-slate-200 px-3 py-2 shadow-2xs hidden lg:block transition-all">
     <div class="max-w-full mx-auto flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
       
-      <!-- Left: Note Durations Brush Picker -->
+      <!-- Left: Note Durations Brush Picker (SVG 그래픽 기반 균일한 크기 동그라미) -->
       <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
         <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 shrink-0" id="durationPicker">
           <span class="text-[11px] sm:text-xs font-bold text-slate-500 px-1.5">음길이:</span>
-          <button data-dur="0.25" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            ♬ 16분
+          
+          <!-- 16분음표 (1/4 채움 SVG) -->
+          <button data-dur="0.25" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>♬ 16분음표</span>
+            <div class="flex items-center justify-center mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8,8 L8,1 A7,7 0 0,1 15,8 Z" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="0.5" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            ♪ 8분
+
+          <!-- 8분음표 (1/2 채움 SVG) -->
+          <button data-dur="0.5" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>♪ 8분음표</span>
+            <div class="flex items-center justify-center mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="1" class="dur-btn active-dur px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-2xs cursor-pointer touch-manipulation">
-            ♩ 4분
+
+          <!-- 4분음표 (전체 채움 SVG) -->
+          <button data-dur="1" class="dur-btn active-dur px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-2xs cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>♩ 4분음표</span>
+            <div class="flex items-center justify-center mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-300" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="1.5" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            ♩. 점4분
+
+          <!-- 점4분음표 -->
+          <button data-dur="1.5" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>♩. 점4분음표</span>
+            <div class="flex items-center justify-center gap-0.5 mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="2" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            𝅗𝅥 2분
+
+          <!-- 2분음표 -->
+          <button data-dur="2" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>𝅗𝅥 2분음표</span>
+            <div class="flex items-center justify-center gap-0.5 mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="3" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            ♩. 점2분
+
+          <!-- 점2분음표 -->
+          <button data-dur="3" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>♩. 점2분음표</span>
+            <div class="flex items-center justify-center gap-0.5 mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+            </div>
           </button>
-          <button data-dur="4" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
-            𝅝 온음표
+
+          <!-- 온음표 -->
+          <button data-dur="4" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
+            <span>𝅝 온음표</span>
+            <div class="flex items-center justify-center gap-0.5 mt-1">
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="7" />
+              </svg>
+            </div>
           </button>
         </div>
       </div>
@@ -300,6 +396,7 @@
     let currentMeasures = 4;
     let bpm = 120;
     let isPlaying = false;
+    let isLooping = false;
     let currentStep = 0;
     let playTimeout = null;
 
@@ -325,37 +422,38 @@
 
     let activeResizeState = null;
 
+    /* 계음 라벨: 연한 파스텔 색상 */
     const noteNamesDiatonic = [
-      { name: 'B4', label: '시', color: 'bg-purple-600 text-white' },
-      { name: 'A4', label: '라', color: 'bg-violet-600 text-white' },
-      { name: 'G4', label: '솔', color: 'bg-blue-600 text-white' },
-      { name: 'F4', label: '파', color: 'bg-emerald-600 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-600 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-600 text-white' },
-      { name: 'C4', label: '도', color: 'bg-rose-600 text-white' }
+      { name: 'B4', label: '시', color: 'bg-purple-100 text-purple-800', noteColor: 'bg-purple-600 text-white' },
+      { name: 'A4', label: '라', color: 'bg-indigo-100 text-indigo-800', noteColor: 'bg-indigo-600 text-white' },
+      { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
+      { name: 'F4', label: '파', color: 'bg-emerald-100 text-emerald-800', noteColor: 'bg-emerald-600 text-white' },
+      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
+      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
 
     const noteNamesPentatonic = [
-      { name: 'A4', label: '라', color: 'bg-violet-600 text-white' },
-      { name: 'G4', label: '솔', color: 'bg-blue-600 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-600 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-600 text-white' },
-      { name: 'C4', label: '도', color: 'bg-rose-600 text-white' }
+      { name: 'A4', label: '라', color: 'bg-indigo-100 text-indigo-800', noteColor: 'bg-indigo-600 text-white' },
+      { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
+      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
+      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
 
     const noteNamesChromatic = [
-      { name: 'B4', label: '시', color: 'bg-purple-600 text-white' },
-      { name: 'A#4', label: '라#', color: 'bg-slate-700 text-white' },
-      { name: 'A4', label: '라', color: 'bg-violet-600 text-white' },
-      { name: 'G#4', label: '솔#', color: 'bg-slate-700 text-white' },
-      { name: 'G4', label: '솔', color: 'bg-blue-600 text-white' },
-      { name: 'F#4', label: '파#', color: 'bg-slate-700 text-white' },
-      { name: 'F4', label: '파', color: 'bg-emerald-600 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-600 text-white' },
-      { name: 'D#4', label: '레#', color: 'bg-slate-700 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-600 text-white' },
-      { name: 'C#4', label: '도#', color: 'bg-slate-700 text-white' },
-      { name: 'C4', label: '도', color: 'bg-rose-600 text-white' }
+      { name: 'B4', label: '시', color: 'bg-purple-100 text-purple-800', noteColor: 'bg-purple-600 text-white' },
+      { name: 'A#4', label: '라#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
+      { name: 'A4', label: '라', color: 'bg-indigo-100 text-indigo-800', noteColor: 'bg-indigo-600 text-white' },
+      { name: 'G#4', label: '솔#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
+      { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
+      { name: 'F#4', label: '파#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
+      { name: 'F4', label: '파', color: 'bg-emerald-100 text-emerald-800', noteColor: 'bg-emerald-600 text-white' },
+      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
+      { name: 'D#4', label: '레#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
+      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'C#4', label: '도#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
+      { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
 
     function getActiveNoteList() {
@@ -383,7 +481,8 @@
           fullList.push({
             name: pitch,
             label: o === 4 ? n.label : `${n.label}(${o})`,
-            color: n.color
+            color: n.color,
+            noteColor: n.noteColor
           });
         });
       }
@@ -402,7 +501,7 @@
         id: 'high', 
         label: '높은소리', 
         selected: '하이햇 (Closed)', 
-        color: 'bg-amber-500 text-white border-amber-600',
+        color: 'text-amber-500',
         shape: '▲',
         soundOpts: ['꽹과리', '소고', '트라이앵글', '하이햇 (Closed)', '하이햇 (Open)', '클랩 (손뼉)'] 
       },
@@ -410,7 +509,7 @@
         id: 'mid', 
         label: '중간소리', 
         selected: '스네어 드럼', 
-        color: 'bg-emerald-500 text-white border-emerald-600',
+        color: 'text-emerald-600',
         shape: '■',
         soundOpts: ['장구', '징', '우드블럭', '스네어 드럼', '탐탐', '림샷'] 
       },
@@ -418,7 +517,7 @@
         id: 'low', 
         label: '낮은소리', 
         selected: '킥 드럼 (베이스)', 
-        color: 'bg-blue-500 text-white border-blue-600',
+        color: 'text-blue-600',
         shape: '●',
         soundOpts: ['북', '용고/대고', '젬베', '킥 드럼 (베이스)', '로우 탐', '카혼 (베이스)'] 
       }
@@ -945,7 +1044,7 @@
         if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
         stepBox.className = `flex-1 h-9 sm:h-10 flex items-center justify-center text-xs font-bold ${borderClass} ${
-          isMeasureStart ? 'bg-emerald-200 text-emerald-950 font-black' : 'bg-slate-100 text-slate-500'
+          isMeasureStart ? 'bg-slate-200 text-slate-800 font-black' : 'bg-slate-100 text-slate-500'
         }`;
         stepBox.innerText = isMeasureStart ? `${Math.floor(s / beatsPerMeasure) + 1}마디` : '';
         stepBox.id = `step-head-${s}`;
@@ -959,6 +1058,7 @@
         const row = document.createElement('div');
         row.className = 'flex items-center w-full';
 
+        /* 계음 라벨: 연한 파스텔 색상 */
         const label = document.createElement('div');
         label.className = `w-16 sm:w-24 shrink-0 ${rowHeightClass} px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200 overflow-hidden`;
         label.innerText = n.label;
@@ -992,14 +1092,15 @@
               const leftPct = offsetInCell * 100;
               const widthPct = (noteData.duration || 1) * 100;
 
-              noteBlock.className = `absolute top-0 h-full ${n.color} shadow-sm rounded-md border border-white/40 flex items-center justify-end z-10 select-none overflow-hidden`;
+              /* 음표 블록만 쨍한 원색(n.noteColor) 적용 */
+              noteBlock.className = `snap-note absolute top-0 h-full ${n.noteColor} shadow-sm rounded-md border border-white/60 flex items-center justify-end z-10 select-none overflow-hidden`;
               noteBlock.style.left = `${leftPct}%`;
               noteBlock.style.width = `${widthPct}%`;
               noteBlock.id = `block-${rowKey}-${subStep}`;
 
               // 오른쪽 끝 전용 드래그 핸들 (오른쪽 테두리 영역)
               const handle = document.createElement('div');
-              handle.className = 'w-4 h-full cursor-ew-resize hover:bg-white/40 active:bg-white/60 flex items-center justify-center shrink-0 text-[10px] font-bold opacity-80 z-20 bg-black/10';
+              handle.className = 'w-4 h-full cursor-ew-resize hover:bg-black/10 active:bg-black/20 flex items-center justify-center shrink-0 text-[10px] font-bold opacity-70 z-20';
               handle.innerText = '⋮';
               
               const startResize = (clientX) => {
@@ -1052,8 +1153,9 @@
             const clickX = e.clientX - rect.left;
             const fraction = Math.max(0, Math.min(0.99, clickX / rect.width));
             
-            const subOffset = Math.floor(fraction * 4) * 0.25;
-            const targetStep = s + subOffset;
+            // 0.25박(16분음표) 그리드 스냅 (자석처럼 딱 맞춤)
+            const subOffset = Math.round(fraction * 4) * 0.25;
+            const targetStep = s + Math.min(0.75, subOffset);
 
             let existingKeyToToggle = null;
             Object.keys(gridData[rowKey]).forEach((existKey) => {
@@ -1149,7 +1251,7 @@
 
           if (gridData[rowKey][targetStep]) {
             const percBlock = document.createElement('div');
-            percBlock.className = `absolute top-0 left-0 w-full h-full ${pTrack.color} shadow-sm rounded-md border border-white/40 flex items-center justify-center z-10 font-black text-xs sm:text-sm select-none`;
+            percBlock.className = `snap-note absolute inset-0 w-full h-full flex items-center justify-center z-10 font-black text-2xl sm:text-3xl leading-none select-none ${pTrack.color}`;
             percBlock.innerText = pTrack.shape;
             cell.appendChild(percBlock);
           }
@@ -1176,6 +1278,7 @@
       setTimeout(updateScrollSpacer, 0);
     }
 
+    /* 자석 드래그 수치 계산 시 0.25 단위 자석 스냅 적용 */
     function handleGlobalMove(clientX) {
       if (!activeResizeState) return;
 
@@ -1231,13 +1334,24 @@
     function playbackLoop() {
       if (!isPlaying) return;
 
+      const totalSteps16th = getTotalSteps() * 4;
+
+      /* 1회 재생 설정일 때 끝에 도달하면 자동 정지 */
+      if (currentStep >= totalSteps16th) {
+        if (isLooping) {
+          currentStep = 0;
+        } else {
+          stopPlayback();
+          return;
+        }
+      }
+
       playStep16th(currentStep);
 
       const quarterBeatDuration = 60 / bpm;
       const step16thDurationMs = (quarterBeatDuration / 4) * 1000;
       
-      const totalSteps16th = getTotalSteps() * 4;
-      currentStep = (currentStep + 1) % totalSteps16th;
+      currentStep++;
 
       playTimeout = setTimeout(playbackLoop, step16thDurationMs);
     }
@@ -1337,7 +1451,7 @@
           'C6': 84, 'B5': 83, 'A#5': 82, 'A5': 81, 'G#5': 80, 'G5': 79, 'F#5': 78, 'F5': 77, 'E5': 76, 'D#5': 75, 'D5': 74, 'C#5': 73, 'C5': 72,
           'B4': 71, 'A#4': 70, 'A4': 69, 'G#4': 68, 'G4': 67, 'F#4': 66, 'F4': 65, 'E4': 64, 'D#4': 63, 'D4': 62, 'C#4': 61, 'C4': 60,
           'B3': 59, 'A#3': 58, 'A3': 57, 'G#3': 56, 'G3': 55, 'F#3': 54, 'F3': 53, 'E3': 52, 'D#3': 51, 'D3': 50, 'C#3': 49, 'C3': 48,
-          'B2': 47, 'A#2': 46, 'A2': 45, 'G#2': 44, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D2': 39, 'D2': 38, 'C#2': 37, 'C2': 36
+          'B2': 47, 'A#2': 46, 'A2': 45, 'G2': 44, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D2': 39, 'D2': 38, 'C#2': 37, 'C2': 36
         };
 
         const ticksPerQuarter = 480;
@@ -1521,9 +1635,18 @@
           document.querySelectorAll('.dur-btn').forEach((b) => {
             b.classList.remove('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
             b.classList.add('text-slate-600');
+            const subSvgContainer = b.querySelector('div svg');
+            if (subSvgContainer) {
+              b.querySelectorAll('svg').forEach(s => {
+                s.classList.replace('text-amber-300', 'text-amber-600');
+              });
+            }
           });
           btn.classList.add('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
           btn.classList.remove('text-slate-600');
+          btn.querySelectorAll('svg').forEach(s => {
+            s.classList.replace('text-amber-600', 'text-amber-300');
+          });
           selectedDuration = parseFloat(btn.dataset.dur);
         });
       });
@@ -1546,6 +1669,27 @@
       });
 
       safeAddListener('stopBtn', 'click', stopPlayback);
+
+      /* 반복 재생 모드 토글 이벤트 */
+      safeAddListener('loopToggleBtn', 'click', () => {
+        isLooping = !isLooping;
+        const loopBtn = document.getElementById('loopToggleBtn');
+        const loopText = document.getElementById('loopModeText');
+
+        if (isLooping) {
+          loopBtn.classList.replace('bg-slate-100', 'bg-emerald-100');
+          loopBtn.classList.replace('text-slate-700', 'text-emerald-800');
+          loopBtn.classList.replace('border-slate-200', 'border-emerald-300');
+          loopText.innerText = '🔁 계속 반복';
+          showToast('연속 반복 재생 모드로 설정되었습니다.');
+        } else {
+          loopBtn.classList.replace('bg-emerald-100', 'bg-slate-100');
+          loopBtn.classList.replace('text-emerald-800', 'text-slate-700');
+          loopBtn.classList.replace('border-emerald-300', 'border-slate-200');
+          loopText.innerText = '1회 재생';
+          showToast('1회 재생 모드로 설정되었습니다.');
+        }
+      });
 
       safeAddListener('clearBtn', 'click', () => {
         gridData = {};
