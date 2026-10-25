@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>가락온 (GarakOn) - 음악 도구</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,12 +12,17 @@
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     * {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
     .grid-cell {
-      transition: all 0.15s ease;
+      transition: background-color 0.1s ease, transform 0.05s ease;
+      touch-action: manipulation;
+    }
+    .grid-cell:active {
+      transform: scale(0.97);
     }
     .grid-cell:hover {
-      filter: brightness(0.95);
+      filter: brightness(0.96);
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -26,14 +31,8 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* 모바일 터치 최적화 스타일 */
-    @media (max-width: 640px) {
-      .mobile-compact-padding {
-        padding: 0.5rem !important;
-      }
-      .mobile-text-xs {
-        font-size: 0.7rem !important;
-      }
+    .smooth-scroll {
+      -webkit-overflow-scrolling: touch;
     }
   </style>
 </head>
@@ -45,7 +44,7 @@
       
       <!-- Brand & Title -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
           <i class="fa-solid fa-music"></i>
         </div>
         <div>
@@ -57,32 +56,32 @@
       <!-- Quick Action Controls & Mobile Settings Toggle -->
       <div class="flex items-center gap-1.5 sm:gap-3">
         <!-- Play / Stop -->
-        <button id="playBtn" class="flex items-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer">
+        <button id="playBtn" class="flex items-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-play text-[10px] sm:text-xs"></i> <span>재생</span>
         </button>
-        <button id="stopBtn" class="flex items-center gap-1.5 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer">
+        <button id="stopBtn" class="flex items-center gap-1.5 px-2.5 py-2 sm:px-4 sm:py-2.5 bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-square text-[10px] sm:text-xs"></i> <span class="hidden sm:inline">정지</span>
         </button>
-        <button id="clearBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer">
+        <button id="clearBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
           <i class="fa-solid fa-trash-can text-xs"></i>
         </button>
 
         <!-- Sample Songs Dropdown -->
         <div class="relative">
-          <button id="sampleBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer">
+          <button id="sampleBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
             <i class="fa-solid fa-music text-amber-600"></i> <span class="hidden sm:inline">예시곡</span> <i class="fa-solid fa-chevron-down text-[10px]"></i>
           </button>
           <div id="sampleMenu" class="hidden absolute right-0 mt-2 w-44 sm:w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
-            <button data-song="airplane" class="w-full text-left px-3 py-2 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+            <button data-song="airplane" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
               ✈️ 비행기 <span class="text-[10px] text-slate-400">4/4박자</span>
             </button>
-            <button data-song="butterfly" class="w-full text-left px-3 py-2 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+            <button data-song="butterfly" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
               🦋 나비야 <span class="text-[10px] text-slate-400">2/4박자</span>
             </button>
-            <button data-song="schoolbell" class="w-full text-left px-3 py-2 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+            <button data-song="schoolbell" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
               🔔 학교종 <span class="text-[10px] text-slate-400">4/4박자</span>
             </button>
-            <button data-song="arirang" class="w-full text-left px-3 py-2 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 flex items-center justify-between cursor-pointer">
+            <button data-song="arirang" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 flex items-center justify-between cursor-pointer">
               🌾 아리랑 <span class="text-[10px] text-slate-400">3/4박자</span>
             </button>
           </div>
@@ -90,30 +89,30 @@
 
         <!-- Save & Export Dropdown -->
         <div class="relative">
-          <button id="exportBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer">
+          <button id="exportBtn" class="flex items-center gap-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation">
             <i class="fa-solid fa-download text-indigo-600"></i> <span class="hidden sm:inline">저장</span> <i class="fa-solid fa-chevron-down text-[10px]"></i>
           </button>
           <div id="exportMenu" class="hidden absolute right-0 mt-2 w-48 sm:w-56 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
-            <button id="exportWav" class="w-full text-left px-3 py-2 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+            <button id="exportWav" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-file-audio text-indigo-500 w-4"></i> 오디오 (.wav)
             </button>
-            <button id="exportMidi" class="w-full text-left px-3 py-2 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+            <button id="exportMidi" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-file-lines text-emerald-500 w-4"></i> 미디 (.mid)
             </button>
-            <button id="saveJson" class="w-full text-left px-3 py-2 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+            <button id="saveJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-floppy-disk text-amber-500 w-4"></i> 백업 (.garakon)
             </button>
-            <button id="loadJson" class="w-full text-left px-3 py-2 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+            <button id="loadJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-folder-open text-blue-500 w-4"></i> 불러오기
             </button>
-            <button id="shareUrl" class="w-full text-left px-3 py-2 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 flex items-center gap-2 cursor-pointer">
+            <button id="shareUrl" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-link text-purple-500 w-4"></i> 공유 링크 복사
             </button>
           </div>
         </div>
 
         <!-- Mobile Toggle Settings Button -->
-        <button id="mobileSettingsToggleBtn" class="lg:hidden flex items-center justify-center p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all cursor-pointer">
+        <button id="mobileSettingsToggleBtn" class="lg:hidden flex items-center justify-center p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 rounded-xl transition-all cursor-pointer touch-manipulation">
           <i class="fa-solid fa-sliders text-sm"></i>
         </button>
 
@@ -134,25 +133,25 @@
       <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
         <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 shrink-0" id="durationPicker">
           <span class="text-[11px] sm:text-xs font-bold text-slate-500 px-1.5">음길이:</span>
-          <button data-dur="0.25" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="0.25" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             ♬ 16분
           </button>
-          <button data-dur="0.5" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="0.5" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             ♪ 8분
           </button>
-          <button data-dur="1" class="dur-btn active-dur px-2 sm:px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-2xs cursor-pointer">
+          <button data-dur="1" class="dur-btn active-dur px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-2xs cursor-pointer touch-manipulation">
             ♩ 4분
           </button>
-          <button data-dur="1.5" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="1.5" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             ♩. 점4분
           </button>
-          <button data-dur="2" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="2" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             𝅗𝅥 2분
           </button>
-          <button data-dur="3" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="3" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             ♩. 점2분
           </button>
-          <button data-dur="4" class="dur-btn px-2 sm:px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button data-dur="4" class="dur-btn px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation">
             𝅝 온음표
           </button>
         </div>
@@ -162,7 +161,7 @@
       <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
         
         <!-- Instrument Select -->
-        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">악기:</span>
           <select id="instSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="piano">🎹 피아노</option>
@@ -175,7 +174,7 @@
         </div>
 
         <!-- Scale Select -->
-        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">음계:</span>
           <select id="scaleSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="diatonic">7음계 (도레미파솔라시)</option>
@@ -185,7 +184,7 @@
         </div>
 
         <!-- Octaves Select -->
-        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">옥타브:</span>
           <select id="octaveSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="1">1옥타브 (C4~B4)</option>
@@ -196,7 +195,7 @@
         </div>
 
         <!-- Time Signature Select -->
-        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">박자:</span>
           <select id="timeSigSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="4/4">4/4 박자</option>
@@ -207,7 +206,7 @@
         </div>
 
         <!-- Measures Count Select -->
-        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">마디:</span>
           <select id="measuresSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="2">2마디</option>
@@ -219,7 +218,7 @@
         </div>
 
         <!-- Tempo Slider -->
-        <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">속도:</span>
           <input type="range" id="bpmRange" min="50" max="200" value="120" class="w-14 sm:w-16 accent-emerald-600 cursor-pointer">
           <span id="bpmVal" class="font-extrabold text-slate-800 text-xs w-6">120</span>
@@ -234,20 +233,20 @@
     <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[82vh]">
       
       <!-- Horizontal Scroll Wrapper -->
-      <div class="w-full overflow-x-auto flex flex-col flex-1">
+      <div class="w-full overflow-x-auto smooth-scroll flex flex-col flex-1">
         
         <!-- Measure Header Row -->
-        <div id="stepsHeader" class="flex bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-500 py-1 pl-16 sm:pl-24 shrink-0 min-w-[600px] sm:min-w-[800px]">
+        <div id="stepsHeader" class="flex bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-500 py-1 pl-16 sm:pl-24 shrink-0 min-w-[650px] sm:min-w-[850px]">
           <!-- Rendered dynamically -->
         </div>
 
         <!-- Melodic Score Grid -->
-        <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100 overflow-y-auto min-w-[600px] sm:min-w-[800px]">
+        <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100 overflow-y-auto smooth-scroll min-w-[650px] sm:min-w-[850px]">
           <!-- Rendered dynamically -->
         </div>
 
         <!-- Percussion Grid -->
-        <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 shrink-0 min-w-[600px] sm:min-w-[800px]">
+        <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 shrink-0 min-w-[650px] sm:min-w-[850px]">
           <!-- Rendered dynamically -->
         </div>
 
@@ -368,24 +367,23 @@
       'B2': 123.47, 'A#2': 116.54, 'A2': 110.00, 'G#2': 103.83, 'G2': 98.00, 'F#2': 92.50, 'F2': 87.31, 'E2': 82.41, 'D#2': 77.78, 'D2': 73.42, 'C#2': 69.30, 'C2': 65.41
     };
 
-    // 타악기 설정 (높은소리, 중간소리, 낮은소리 별 한국악기 + 현대 타악기 옵션 각 2개씩 추가)
     const percTracks = [
       { 
         id: 'high', 
         label: '높은소리', 
-        selected: '꽹과리', 
+        selected: '하이햇 (Closed)', 
         soundOpts: ['꽹과리', '소고', '트라이앵글', '하이햇 (Closed)', '하이햇 (Open)', '클랩 (손뼉)'] 
       },
       { 
         id: 'mid', 
         label: '중간소리', 
-        selected: '장구', 
+        selected: '스네어 드럼', 
         soundOpts: ['장구', '징', '우드블럭', '스네어 드럼', '탐탐', '림샷'] 
       },
       { 
         id: 'low', 
         label: '낮은소리', 
-        selected: '북', 
+        selected: '킥 드럼 (베이스)', 
         soundOpts: ['북', '용고/대고', '젬베', '킥 드럼 (베이스)', '로우 탐', '카혼 (베이스)'] 
       }
     ];
@@ -606,7 +604,6 @@
 
       if (type === 'high') {
         if (instrument === '꽹과리') {
-          // 실제와 가까운 꽹과리 (금속성 오버톤 복합 음원)
           const osc1 = ctx.createOscillator();
           const osc2 = ctx.createOscillator();
           const osc3 = ctx.createOscillator();
@@ -688,7 +685,7 @@
 
           noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
           noise.start(now); noise.stop(now + 0.25);
-        } else { // 클랩 (손뼉)
+        } else {
           const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
           const output = noiseBuffer.getChannelData(0);
           for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
@@ -800,7 +797,7 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now); osc.stop(now + 0.25);
-        } else { // 림샷
+        } else {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'triangle';
@@ -863,7 +860,7 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now); osc.stop(now + 0.35);
-        } else { // 카혼 (베이스)
+        } else {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'triangle';
@@ -913,7 +910,7 @@
         row.className = 'flex items-center w-full';
 
         const label = document.createElement('div');
-        label.className = `w-16 sm:w-24 shrink-0 h-12 sm:h-14 px-1.5 py-1.5 sm:px-2 sm:py-2 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200`;
+        label.className = `w-16 sm:w-24 shrink-0 h-11 sm:h-14 px-1.5 py-1.5 sm:px-2 sm:py-2 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200`;
         label.innerText = n.label;
         row.appendChild(label);
 
@@ -930,7 +927,7 @@
           if (isMeasureStart && s > 0) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 h-12 sm:h-14 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
+          cell.className = `grid-cell flex-1 h-11 sm:h-14 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
             isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'
           }`;
           cell.id = `cell-${rowKey}-${s}`;
@@ -952,7 +949,7 @@
             }
           });
 
-          cell.addEventListener('click', (e) => {
+          const handleCellClick = (e) => {
             getAudioContext();
             const rect = cell.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
@@ -968,7 +965,9 @@
               playNote(rowKey, selectedDuration * (60 / bpm));
             }
             renderGrid();
-          });
+          };
+
+          cell.addEventListener('click', handleCellClick);
 
           cellsContainer.appendChild(cell);
         }
@@ -982,13 +981,12 @@
         row.className = 'flex items-center w-full';
 
         const label = document.createElement('div');
-        label.className = 'w-16 sm:w-24 shrink-0 h-12 sm:h-14 bg-amber-50 border border-amber-200 border-r-0 px-1 py-1 sm:px-2 sm:py-1.5 text-slate-800 shadow-2xs text-[10px] sm:text-xs font-black flex flex-col items-start justify-center gap-0.5';
+        label.className = 'w-16 sm:w-24 shrink-0 h-11 sm:h-14 bg-amber-50 border border-amber-200 border-r-0 px-1 py-1 sm:px-2 sm:py-1.5 text-slate-800 shadow-2xs text-[10px] sm:text-xs font-black flex flex-col items-start justify-center gap-0.5';
         
         const titleSpan = document.createElement('span');
         titleSpan.innerText = pTrack.label;
         label.appendChild(titleSpan);
 
-        // 타악기 선택 드롭다운 생성
         const select = document.createElement('select');
         select.className = 'bg-white border border-amber-300 rounded text-[9px] sm:text-[11px] font-bold text-slate-700 px-0.5 py-0.5 w-full cursor-pointer focus:outline-none';
         pTrack.soundOpts.forEach(opt => {
@@ -1033,10 +1031,10 @@
           }
 
           if (isActive) {
-            cell.className = `grid-cell flex-1 h-12 sm:h-14 ${shapeColor} font-extrabold text-sm sm:text-base flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer`;
+            cell.className = `grid-cell flex-1 h-11 sm:h-14 ${shapeColor} font-extrabold text-sm sm:text-base flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer touch-manipulation`;
             cell.innerText = shapeSymbol;
           } else {
-            cell.className = `grid-cell flex-1 h-12 sm:h-14 border-t border-b border-amber-200/60 cursor-pointer ${borderClass} ${
+            cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 cursor-pointer touch-manipulation ${borderClass} ${
               isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
             }`;
           }
@@ -1365,10 +1363,8 @@
         });
       });
 
-      // 스페이스바로 재생 / 정지 토글 기능
       window.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
-          // 입력 폼 요소에 포커스가 맞춰져 있을 때는 동작하지 않도록 예외 처리
           const activeElem = document.activeElement;
           if (activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'SELECT' || activeElem.tagName === 'TEXTAREA')) {
             return;
@@ -1449,7 +1445,6 @@
       safeAddListener('jsonInput', 'change', loadBackupJson);
       safeAddListener('shareUrl', 'click', () => { shareUrlLink(); if (exportMenu) exportMenu.classList.add('hidden'); });
 
-      // Mobile Settings Toggle Listener
       const mobileSettingsToggleBtn = document.getElementById('mobileSettingsToggleBtn');
       const controlsToolbar = document.getElementById('controlsToolbar');
       if (mobileSettingsToggleBtn && controlsToolbar) {
@@ -1472,9 +1467,3 @@
   </script>
 </body>
 </html>
-```
-
-### 수정 내용 Summary
-- 음계 및 타악기 셀 높이를 기존 `h-7 sm:h-9`에서 **`h-12 sm:h-14`**로 대폭 변경하여 터치/클릭이 쉽고 시원해지도록 위아래 크기를 확충했습니다.
-- 헤더 및 음계 라벨, 타악기 레이아웃의 높이도 새로 변경된 그리드 셀 크기에 맞춰 정렬을 고르게 정비했습니다.
-- 오디오 처리 및 MIDI 저장 등 기존 로직 및 나머지 구성 요소에는 전혀 변경을 가하지 않았습니다.
