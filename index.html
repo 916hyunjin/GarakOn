@@ -994,22 +994,37 @@
             const subOffset = Math.floor(fraction * 4) * 0.25;
             const targetStep = s + subOffset;
 
-            if (gridData[rowKey][targetStep]) {
-              delete gridData[rowKey][targetStep];
+            // 클릭한 지점(targetStep)을 포함하고 있는 기존 음표 찾기
+            let existingKeyToToggle = null;
+            Object.keys(gridData[rowKey]).forEach((existKey) => {
+              const existStep = parseFloat(existKey);
+              const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
+              if (targetStep >= existStep && targetStep < existStep + existDur - 0.001) {
+                existingKeyToToggle = existKey;
+              }
+            });
+
+            if (existingKeyToToggle !== null) {
+              // 이미 입력된 음표를 클릭한 경우: 해당 음표 삭제 (재클릭 삭제 기능)
+              delete gridData[rowKey][existingKeyToToggle];
             } else {
-              let isCovered = false;
+              // 새로 추가할 경우: 새로 추가될 영역(targetStep ~ targetStep + selectedDuration)과 겹치는 기존 음표 자동 삭제
+              const newStart = targetStep;
+              const newEnd = targetStep + selectedDuration;
+
               Object.keys(gridData[rowKey]).forEach((existKey) => {
                 const existStep = parseFloat(existKey);
-                const existDur = gridData[rowKey][existKey].duration || 1;
-                if (targetStep >= existStep && targetStep < existStep + existDur) {
-                  isCovered = true;
+                const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
+                const existEnd = existStep + existDur;
+
+                // 두 범위가 조금이라도 겹치면 삭제
+                if (Math.max(newStart, existStep) < Math.min(newEnd, existEnd) - 0.001) {
+                  delete gridData[rowKey][existKey];
                 }
               });
 
-              if (!isCovered) {
-                gridData[rowKey][targetStep] = { duration: selectedDuration };
-                playNote(rowKey, selectedDuration * (60 / bpm));
-              }
+              gridData[rowKey][targetStep] = { duration: selectedDuration };
+              playNote(rowKey, selectedDuration * (60 / bpm));
             }
             renderGrid();
           };
@@ -1097,22 +1112,36 @@
             const subOffset = Math.floor(fraction * 4) * 0.25;
             const targetStep = s + subOffset;
 
-            if (gridData[rowKey][targetStep]) {
-              delete gridData[rowKey][targetStep];
+            // 클릭한 위치에 이미 존재하는 타악기 노트 영역 확인
+            let existingKeyToToggle = null;
+            Object.keys(gridData[rowKey]).forEach((existKey) => {
+              const existStep = parseFloat(existKey);
+              const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
+              if (targetStep >= existStep && targetStep < existStep + existDur - 0.001) {
+                existingKeyToToggle = existKey;
+              }
+            });
+
+            if (existingKeyToToggle !== null) {
+              // 이미 있는 타악기 노트를 클릭한 경우: 재클릭 삭제
+              delete gridData[rowKey][existingKeyToToggle];
             } else {
-              let isCovered = false;
+              // 새 타악기 노트 추가 시: 입력하려는 영역(targetStep ~ targetStep + selectedDuration)과 겹치는 기존 노트 자동 삭제
+              const newStart = targetStep;
+              const newEnd = targetStep + selectedDuration;
+
               Object.keys(gridData[rowKey]).forEach((existKey) => {
                 const existStep = parseFloat(existKey);
-                const existDur = gridData[rowKey][existKey]?.duration || 1;
-                if (targetStep >= existStep && targetStep < existStep + existDur) {
-                  isCovered = true;
+                const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
+                const existEnd = existStep + existDur;
+
+                if (Math.max(newStart, existStep) < Math.min(newEnd, existEnd) - 0.001) {
+                  delete gridData[rowKey][existKey];
                 }
               });
 
-              if (!isCovered) {
-                gridData[rowKey][targetStep] = { duration: selectedDuration };
-                playPercussion(pTrack.id);
-              }
+              gridData[rowKey][targetStep] = { duration: selectedDuration };
+              playPercussion(pTrack.id);
             }
             renderGrid();
           };
