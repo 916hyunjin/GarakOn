@@ -1344,7 +1344,7 @@
       setTimeout(updateScrollSpacer, 0);
     }
 
-    /* VexFlow 기반 오선보 악보 변환 및 렌더링 함수 (박자표 곡 처음에만 표시 & 곡 끝 마디 겹세로줄 수정 완료) */
+    /* VexFlow 기반 오선보 악보 변환 및 렌더링 함수 (음표 기둥 방향 규칙 추가 완료) */
     function renderSheetMusic() {
       const container = document.getElementById('sheetContainer');
       if (!container) return;
@@ -1431,7 +1431,6 @@
 
           if (isFirstInLine) {
             stave.addClef('treble');
-            // 박자표는 곡의 맨 처음(0번 마디)에만 추가
             if (isFirstMeasureOfSong) {
               stave.addTimeSignature(currentTimeSig);
             }
@@ -1439,7 +1438,6 @@
             stave.setBegBarType(VF.Barline.type.NONE);
           }
 
-          // 곡의 마지막 마디인 경우 끝 세로줄(겹세로줄/END)로 설정
           if (isLastMeasureOfSong) {
             stave.setEndBarType(VF.Barline.type.END);
           }
@@ -1465,7 +1463,7 @@
 
     function addVexNote(arr, pitchStr, durBeats, VF) {
       let key = pitchStr.toLowerCase().replace('#', 'b');
-      let octave = pitchStr.slice(-1);
+      let octave = parseInt(pitchStr.slice(-1));
       let noteName = pitchStr.slice(0, -1).toLowerCase();
       let vexKey = `${noteName}/${octave}`;
 
@@ -1480,7 +1478,22 @@
       else if (durBeats === 3) { vexDur = 'h'; isDotted = true; }
       else if (durBeats === 4) vexDur = 'w';
 
-      const note = new VF.StaveNote({ clef: 'treble', keys: [vexKey], duration: vexDur });
+      // 오선보 셋째 줄(B4/시) 이상이면 기둥이 아래(DOWN), 미만이면 위(UP)
+      const pitchValueOrder = { 'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5, 'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11 };
+      const absPitchValue = octave * 12 + (pitchValueOrder[noteName] || 0);
+      const b4PitchValue = 4 * 12 + 11; // B4의 절대 음가 값
+
+      let stemDir = VF.StaveNote.STEM_UP;
+      if (absPitchValue >= b4PitchValue) {
+        stemDir = VF.StaveNote.STEM_DOWN;
+      }
+
+      const note = new VF.StaveNote({ 
+        clef: 'treble', 
+        keys: [vexKey], 
+        duration: vexDur,
+        stem_direction: stemDir 
+      });
 
       if (pitchStr.includes('#')) {
         note.addModifier(new VF.Accidental('#'));
