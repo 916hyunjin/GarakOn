@@ -235,7 +235,7 @@
 
   <!-- Main Grid Area -->
   <main class="flex-1 w-full p-2 sm:p-4 flex flex-col justify-center overflow-hidden">
-    <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[72vh] sm:max-h-[68vh]">
+    <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[85vh] lg:max-h-[88vh]">
       
       <!-- Horizontal Scroll Wrapper -->
       <div class="w-full overflow-x-auto flex flex-col flex-1">
@@ -934,7 +934,7 @@
           if (isMeasureStart && s > 0) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 h-7 sm:h-9 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
+          cell.className = `grid-cell flex-1 h-8 sm:h-12 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
             isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'
           }`;
           cell.id = `cell-${rowKey}-${s}`;
@@ -1037,10 +1037,10 @@
           }
 
           if (isActive) {
-            cell.className = `grid-cell flex-1 h-7 sm:h-9 ${shapeColor} font-extrabold text-[10px] sm:text-xs flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer`;
+            cell.className = `grid-cell flex-1 h-8 sm:h-12 ${shapeColor} font-extrabold text-[10px] sm:text-xs flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer`;
             cell.innerText = shapeSymbol;
           } else {
-            cell.className = `grid-cell flex-1 h-7 sm:h-9 border-t border-b border-amber-200/60 cursor-pointer ${borderClass} ${
+            cell.className = `grid-cell flex-1 h-8 sm:h-12 border-t border-b border-amber-200/60 cursor-pointer ${borderClass} ${
               isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
             }`;
           }
