@@ -964,8 +964,19 @@
             if (gridData[rowKey][targetStep]) {
               delete gridData[rowKey][targetStep];
             } else {
-              gridData[rowKey][targetStep] = { duration: selectedDuration };
-              playNote(rowKey, selectedDuration * (60 / bpm));
+              let isCovered = false;
+              Object.keys(gridData[rowKey]).forEach((existKey) => {
+                const existStep = parseFloat(existKey);
+                const existDur = gridData[rowKey][existKey].duration || 1;
+                if (targetStep >= existStep && targetStep < existStep + existDur) {
+                  isCovered = true;
+                }
+              });
+
+              if (!isCovered) {
+                gridData[rowKey][targetStep] = { duration: selectedDuration };
+                playNote(rowKey, selectedDuration * (60 / bpm));
+              }
             }
             renderGrid();
           };
@@ -1009,20 +1020,23 @@
         row.appendChild(label);
 
         const cellsContainer = document.createElement('div');
-        cellsContainer.className = 'flex flex-1 w-full';
+        cellsContainer.className = 'flex flex-1 w-full relative';
 
         const rowKey = `perc_${pTrack.id}`;
         if (!gridData[rowKey]) gridData[rowKey] = {};
 
         for (let s = 0; s < totalQuarterBeats; s++) {
-          const isActive = gridData[rowKey][s];
           const isMeasureStart = s % beatsPerMeasure === 0;
 
           let borderClass = 'border-r border-amber-200/80';
           if (isMeasureStart && s > 0) borderClass = 'border-l-2 border-l-slate-300 border-r border-amber-200';
 
-          const cell = document.createElement('button');
-          
+          const cell = document.createElement('div');
+          cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 relative cursor-pointer ${borderClass} ${
+            isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
+          }`;
+          cell.id = `cell-${rowKey}-${s}`;
+
           let shapeSymbol = '●';
           let shapeColor = 'bg-blue-500 text-white border-blue-600 rounded-full';
           if (pTrack.id === 'mid') {
@@ -1033,23 +1047,40 @@
             shapeColor = 'bg-amber-500 text-white border-amber-600 rounded-none';
           }
 
-          if (isActive) {
-            cell.className = `grid-cell flex-1 h-11 sm:h-14 ${shapeColor} font-extrabold text-sm sm:text-base flex items-center justify-center border-t border-b ${borderClass} shadow-2xs cursor-pointer touch-manipulation`;
-            cell.innerText = shapeSymbol;
-          } else {
-            cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 cursor-pointer touch-manipulation ${borderClass} ${
-              isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
-            }`;
-          }
+          Object.keys(gridData[rowKey]).forEach((subKey) => {
+            const subStep = parseFloat(subKey);
+            if (subStep >= s && subStep < s + 1 && gridData[rowKey][subKey]) {
+              const offsetInCell = subStep - s;
+              const percBlock = document.createElement('div');
+              
+              const leftPct = offsetInCell * 100;
 
-          cell.addEventListener('click', () => {
+              percBlock.className = `absolute top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 ${shapeColor} font-extrabold text-xs sm:text-sm flex items-center justify-center z-10 shadow-2xs pointer-events-none`;
+              percBlock.style.left = `calc(${leftPct}% + 2px)`;
+              percBlock.innerText = shapeSymbol;
+              cell.appendChild(percBlock);
+            }
+          });
+
+          const handleCellClick = (e) => {
             getAudioContext();
-            gridData[rowKey][s] = !gridData[rowKey][s];
-            if (gridData[rowKey][s]) {
+            const rect = cell.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const fraction = Math.max(0, Math.min(0.99, clickX / rect.width));
+            
+            const subOffset = Math.floor(fraction * 4) * 0.25;
+            const targetStep = s + subOffset;
+
+            if (gridData[rowKey][targetStep]) {
+              delete gridData[rowKey][targetStep];
+            } else {
+              gridData[rowKey][targetStep] = true;
               playPercussion(pTrack.id);
             }
             renderGrid();
-          });
+          };
+
+          cell.addEventListener('click', handleCellClick);
 
           cellsContainer.appendChild(cell);
         }
@@ -1126,14 +1157,12 @@
         }
       });
 
-      if (subOffset === 0) {
-        percTracks.forEach((pTrack) => {
-          const rowKey = `perc_${pTrack.id}`;
-          if (gridData[rowKey] && gridData[rowKey][beatIndex]) {
-            playPercussion(pTrack.id);
-          }
-        });
-      }
+      percTracks.forEach((pTrack) => {
+        const rowKey = `perc_${pTrack.id}`;
+        if (gridData[rowKey] && gridData[rowKey][currentSubStep]) {
+          playPercussion(pTrack.id);
+        }
+      });
     }
 
     function loadSampleSong(key) {
