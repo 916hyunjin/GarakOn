@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>가락온 (GarakOn) - 음악 도구</title>
+  <title>가락온 (GarakOn) - 가락을 만들어요</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -56,7 +56,7 @@
             가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span>
           </h1>
           <p class="text-[10px] sm:text-xs text-slate-500 font-medium whitespace-nowrap leading-tight mt-0.5">
-            가락을 만드는 음악 도구
+            가락을 만들어요
           </p>
         </div>
 
@@ -266,11 +266,11 @@
   </main>
 
   <!-- Footer Banner -->
-  <footer class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white py-3 px-4 text-center border-t border-slate-800 shrink-0 shadow-md">
-    <div class="flex items-center justify-center gap-2">
-      <i class="fa-solid fa-graduation-cap text-emerald-400 text-sm"></i>
-      <span class="font-bold text-xs sm:text-sm tracking-wide">서울교대 박현진 스튜디오</span>
-      <span class="text-[10px] text-slate-400 font-normal ml-1">| GarakOn Music Lab</span>
+  <footer class="bg-slate-100 text-slate-500 py-2.5 px-4 text-center border-t border-slate-200 shrink-0">
+    <div class="flex items-center justify-center gap-1.5">
+      <i class="fa-solid fa-graduation-cap text-slate-400 text-xs"></i>
+      <span class="font-medium text-xs tracking-wide">서울교대 박현진 스튜디오</span>
+      <span class="text-[10px] text-slate-400 ml-0.5">| GarakOn Music Lab</span>
     </div>
   </footer>
 
@@ -314,7 +314,16 @@
       return getBeatsPerMeasure() * currentMeasures;
     }
 
+    function getNoteRowHeightClass() {
+      if (currentOctaves === 2) return 'h-7 sm:h-9';
+      if (currentOctaves === 3) return 'h-5 sm:h-6';
+      if (currentOctaves === 4) return 'h-4 sm:h-5';
+      return 'h-11 sm:h-14';
+    }
+
     let gridData = {};
+
+    let activeResizeState = null;
 
     const noteNamesDiatonic = [
       { name: 'B4', label: '시', color: 'bg-purple-600 text-white' },
@@ -419,6 +428,7 @@
       airplane: {
         name: '비행기',
         bpm: 120,
+        inst: 'piano',
         scale: 'diatonic',
         octaves: 1,
         timeSig: '4/4',
@@ -428,14 +438,21 @@
           "D4": { "1": { "duration": 1 }, "3": { "duration": 1 }, "8": { "duration": 1 }, "9": { "duration": 1 }, "10": { "duration": 2 } },
           "C4": { "2": { "duration": 1 } },
           "G4": { "13": { "duration": 1 }, "14": { "duration": 2 } },
-          "perc_low": { "0": { "duration": 1 }, "4": { "duration": 1 }, "8": { "duration": 1 }, "12": { "duration": 1 } },
-          "perc_mid": { "2": { "duration": 1 }, "6": { "duration": 1 }, "10": { "duration": 1 }, "14": { "duration": 1 } },
-          "perc_high": { "0": { "duration": 1 }, "1": { "duration": 1 }, "2": { "duration": 1 }, "3": { "duration": 1 }, "4": { "duration": 1 }, "5": { "duration": 1 }, "6": { "duration": 1 }, "7": { "duration": 1 }, "8": { "duration": 1 }, "9": { "duration": 1 }, "10": { "duration": 1 }, "11": { "duration": 1 }, "12": { "duration": 1 }, "13": { "duration": 1 }, "14": { "duration": 1 }, "15": { "duration": 1 } }
+          "perc_mid": {
+            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "9": { "duration": 0.5 }, "11": { "duration": 0.5 }, "13": { "duration": 0.5 }, "15": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "7.0": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.0": { "duration": 0.5 }, "14.5": { "duration": 0.5 }, "15.0": { "duration": 0.5 }, "15.5": { "duration": 0.5 }
+          },
+          "perc_low": {
+            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "8.0": { "duration": 0.5 }, "12.0": { "duration": 0.5 }, "14.0": { "duration": 0.5 }
+          },
+          "perc_high": {
+            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "3": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "11": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "15": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "9.5": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.5": { "duration": 0.5 }, "15.5": { "duration": 0.5 }
+          }
         }
       },
       butterfly: {
         name: '나비야',
         bpm: 110,
+        inst: 'piano',
         scale: 'diatonic',
         octaves: 1,
         timeSig: '2/4',
@@ -445,13 +462,21 @@
           "E4": { "1": { "duration": 1 }, "2": { "duration": 2 } },
           "F4": { "4": { "duration": 1 } },
           "D4": { "5": { "duration": 1 }, "6": { "duration": 2 } },
-          "perc_low": { "0": { "duration": 1 }, "2": { "duration": 1 }, "4": { "duration": 1 }, "6": { "duration": 1 } },
-          "perc_high": { "1": { "duration": 1 }, "3": { "duration": 1 }, "5": { "duration": 1 }, "7": { "duration": 1 } }
+          "perc_high": {
+            "3": { "duration": 0.5 }, "7": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "0.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }
+          },
+          "perc_low": {
+            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "2.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "7.0": { "duration": 0.5 }
+          },
+          "perc_mid": {
+            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }
+          }
         }
       },
       schoolbell: {
         name: '학교종',
         bpm: 120,
+        inst: 'piano',
         scale: 'diatonic',
         octaves: 1,
         timeSig: '4/4',
@@ -461,48 +486,36 @@
           "A4": { "2": { "duration": 1 }, "3": { "duration": 1 } },
           "E4": { "6": { "duration": 2 }, "10": { "duration": 1 }, "11": { "duration": 1 } },
           "D4": { "12": { "duration": 4 } },
-          "perc_low": { "0": { "duration": 1 }, "4": { "duration": 1 }, "8": { "duration": 1 }, "12": { "duration": 1 } },
-          "perc_mid": { "2": { "duration": 1 }, "6": { "duration": 1 }, "10": { "duration": 1 }, "14": { "duration": 1 } }
+          "perc_mid": {
+            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "9": { "duration": 0.5 }, "11": { "duration": 0.5 }, "13": { "duration": 0.5 }, "15": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "7.0": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.0": { "duration": 0.5 }, "15.0": { "duration": 0.5 }, "15.5": { "duration": 0.5 }, "14.5": { "duration": 0.5 }
+          },
+          "perc_low": {
+            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "8.0": { "duration": 0.5 }, "12.0": { "duration": 0.5 }, "14.0": { "duration": 0.5 }
+          },
+          "perc_high": {
+            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "15": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "9.5": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "14.5": { "duration": 0.5 }, "15.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "13.5": { "duration": 0.5 }
+          }
         }
       },
       arirang: {
         name: '아리랑',
         bpm: 120,
+        inst: 'strings',
         scale: 'pentatonic',
         octaves: 2,
         timeSig: '3/4',
         measures: 4,
         gridData: {
-          "G3": {
-            "0": { "duration": 1.5 },
-            "2": { "duration": 0.5 },
-            "9": { "duration": 2.5 },
-            "11.5": { "duration": 0.5 }
-          },
-          "A3": {
-            "1.5": { "duration": 0.5 },
-            "2.5": { "duration": 0.5 },
-            "8.5": { "duration": 0.5 }
-          },
-          "C4": {
-            "3": { "duration": 1.5 },
-            "5": { "duration": 0.5 },
-            "8": { "duration": 0.5 }
-          },
-          "D4": {
-            "4.5": { "duration": 0.5 },
-            "5.5": { "duration": 0.5 },
-            "7": { "duration": 1.0 }
-          },
-          "E4": {
-            "6": { "duration": 1.0 }
-          },
-          "perc_high": {},
+          "G4": { "0": { "duration": 1.5 }, "2": { "duration": 0.5 }, "9": { "duration": 3 } },
+          "A4": { "8.5": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 } },
+          "C5": { "3": { "duration": 1.5 }, "5": { "duration": 0.5 }, "8": { "duration": 0.5 } },
+          "D5": { "7": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.75": { "duration": 0.25 } },
+          "E5": { "6": { "duration": 1 }, "7.5": { "duration": 0.25 } },
           "perc_mid": {
-            "1": { "duration": 1 }, "2": { "duration": 1 }, "4": { "duration": 1 }, "5": { "duration": 1 }, "7": { "duration": 1 }, "8": { "duration": 1 }, "10": { "duration": 1 }, "11": { "duration": 1 }
+            "0": { "duration": 0.5 }, "1": { "duration": 0.5 }, "2": { "duration": 0.5 }, "3": { "duration": 0.5 }, "4": { "duration": 0.5 }, "5": { "duration": 0.5 }, "6": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "9": { "duration": 0.5 }, "10": { "duration": 0.5 }, "11": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "9.0": { "duration": 0.5 }
           },
           "perc_low": {
-            "0": { "duration": 1 }, "3": { "duration": 1 }, "6": { "duration": 1 }, "9": { "duration": 1 }
+            "0": { "duration": 0.5 }, "3": { "duration": 0.5 }, "6": { "duration": 0.5 }, "9": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "2.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "9.0": { "duration": 0.5 }, "10.0": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "8.5": { "duration": 0.5 }, "10.5": { "duration": 0.5 }
           }
         }
       }
@@ -727,7 +740,7 @@
           gain.gain.setValueAtTime(0.8, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
-          noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+          noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
           noise.start(now); noise.stop(now + 0.12);
         }
 
@@ -940,13 +953,14 @@
       }
 
       const activeNotes = getActiveNoteList();
+      const rowHeightClass = getNoteRowHeightClass();
 
       activeNotes.forEach((n) => {
         const row = document.createElement('div');
         row.className = 'flex items-center w-full';
 
         const label = document.createElement('div');
-        label.className = `w-16 sm:w-24 shrink-0 h-11 sm:h-14 px-1.5 py-1.5 sm:px-2 sm:py-2 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200`;
+        label.className = `w-16 sm:w-24 shrink-0 ${rowHeightClass} px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-black shadow-2xs ${n.color} flex items-center justify-between border-b border-slate-200 overflow-hidden`;
         label.innerText = n.label;
         row.appendChild(label);
 
@@ -963,7 +977,7 @@
           if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 h-11 sm:h-14 border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
+          cell.className = `grid-cell flex-1 ${rowHeightClass} border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
             isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'
           }`;
           cell.id = `cell-${rowKey}-${s}`;
@@ -978,14 +992,61 @@
               const leftPct = offsetInCell * 100;
               const widthPct = (noteData.duration || 1) * 100;
 
-              noteBlock.className = `absolute top-0 h-full ${n.color} shadow-sm rounded-md border border-white/40 flex items-center justify-center z-10`;
+              noteBlock.className = `absolute top-0 h-full ${n.color} shadow-sm rounded-md border border-white/40 flex items-center justify-end z-10 select-none overflow-hidden`;
               noteBlock.style.left = `${leftPct}%`;
               noteBlock.style.width = `${widthPct}%`;
+              noteBlock.id = `block-${rowKey}-${subStep}`;
+
+              // 오른쪽 끝 전용 드래그 핸들 (오른쪽 테두리 영역)
+              const handle = document.createElement('div');
+              handle.className = 'w-4 h-full cursor-ew-resize hover:bg-white/40 active:bg-white/60 flex items-center justify-center shrink-0 text-[10px] font-bold opacity-80 z-20 bg-black/10';
+              handle.innerText = '⋮';
+              
+              const startResize = (clientX) => {
+                const totalBeats = getTotalSteps();
+                let nextKeyStep = totalBeats;
+
+                Object.keys(gridData[rowKey]).forEach(k => {
+                  const kStep = parseFloat(k);
+                  if (kStep > subStep && kStep < nextKeyStep) {
+                    nextKeyStep = kStep;
+                  }
+                });
+
+                const maxDur = nextKeyStep - subStep;
+
+                activeResizeState = {
+                  rowKey: rowKey,
+                  startStep: subStep,
+                  startDur: noteData.duration || 1,
+                  startClientX: clientX,
+                  cellWidthPx: cell.getBoundingClientRect().width,
+                  totalSteps: totalBeats,
+                  maxDuration: maxDur,
+                  targetElem: noteBlock
+                };
+              };
+
+              handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                startResize(e.clientX);
+              });
+
+              handle.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                if (e.touches.length > 0) {
+                  startResize(e.touches[0].clientX);
+                }
+              }, { passive: false });
+
+              noteBlock.appendChild(handle);
               cell.appendChild(noteBlock);
             }
           });
 
           const handleCellClick = (e) => {
+            if (activeResizeState) return;
             getAudioContext();
             const rect = cell.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
@@ -994,7 +1055,6 @@
             const subOffset = Math.floor(fraction * 4) * 0.25;
             const targetStep = s + subOffset;
 
-            // 클릭한 지점(targetStep)을 포함하고 있는 기존 음표 찾기
             let existingKeyToToggle = null;
             Object.keys(gridData[rowKey]).forEach((existKey) => {
               const existStep = parseFloat(existKey);
@@ -1005,10 +1065,8 @@
             });
 
             if (existingKeyToToggle !== null) {
-              // 이미 입력된 음표를 클릭한 경우: 해당 음표 삭제 (재클릭 삭제 기능)
               delete gridData[rowKey][existingKeyToToggle];
             } else {
-              // 새로 추가할 경우: 새로 추가될 영역(targetStep ~ targetStep + selectedDuration)과 겹치는 기존 음표 자동 삭제
               const newStart = targetStep;
               const newEnd = targetStep + selectedDuration;
 
@@ -1017,7 +1075,6 @@
                 const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
                 const existEnd = existStep + existDur;
 
-                // 두 범위가 조금이라도 겹치면 삭제
                 if (Math.max(newStart, existStep) < Math.min(newEnd, existEnd) - 0.001) {
                   delete gridData[rowKey][existKey];
                 }
@@ -1037,6 +1094,9 @@
         row.appendChild(cellsContainer);
         scoreGrid.appendChild(row);
       });
+
+      // 타악기 트랙: 1마디에 8칸
+      const totalSubBeats8th = totalQuarterBeats * 2;
 
       percTracks.forEach((pTrack) => {
         const row = document.createElement('div');
@@ -1073,8 +1133,11 @@
         const rowKey = `perc_${pTrack.id}`;
         if (!gridData[rowKey]) gridData[rowKey] = {};
 
-        for (let s = 0; s < totalQuarterBeats; s++) {
-          const isMeasureStart = s % beatsPerMeasure === 0;
+        const subBeatsPerMeasure8th = beatsPerMeasure * 2;
+
+        for (let subIdx = 0; subIdx < totalSubBeats8th; subIdx++) {
+          const isMeasureStart = subIdx % subBeatsPerMeasure8th === 0;
+          const targetStep = subIdx * 0.5;
 
           let borderClass = 'border-r border-amber-200/80';
           if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-amber-200';
@@ -1083,64 +1146,20 @@
           cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 relative cursor-pointer ${borderClass} ${
             isMeasureStart ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
           }`;
-          cell.id = `cell-${rowKey}-${s}`;
 
-          Object.keys(gridData[rowKey]).forEach((subKey) => {
-            const subStep = parseFloat(subKey);
-            if (subStep >= s && subStep < s + 1 && gridData[rowKey][subKey]) {
-              const percData = gridData[rowKey][subKey];
-              const offsetInCell = subStep - s;
-              const percBlock = document.createElement('div');
-              
-              const leftPct = offsetInCell * 100;
-              const widthPct = (percData.duration || 1) * 100;
+          if (gridData[rowKey][targetStep]) {
+            const percBlock = document.createElement('div');
+            percBlock.className = `absolute top-0 left-0 w-full h-full ${pTrack.color} shadow-sm rounded-md border border-white/40 flex items-center justify-center z-10 font-black text-xs sm:text-sm select-none`;
+            percBlock.innerText = pTrack.shape;
+            cell.appendChild(percBlock);
+          }
 
-              percBlock.className = `absolute top-0 h-full ${pTrack.color} shadow-sm rounded-md border border-white/40 flex items-center justify-center z-10 font-black text-xs sm:text-sm`;
-              percBlock.style.left = `${leftPct}%`;
-              percBlock.style.width = `${widthPct}%`;
-              percBlock.innerText = pTrack.shape;
-              cell.appendChild(percBlock);
-            }
-          });
-
-          const handleCellClick = (e) => {
+          const handleCellClick = () => {
             getAudioContext();
-            const rect = cell.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const fraction = Math.max(0, Math.min(0.99, clickX / rect.width));
-            
-            const subOffset = Math.floor(fraction * 4) * 0.25;
-            const targetStep = s + subOffset;
-
-            // 클릭한 위치에 이미 존재하는 타악기 노트 영역 확인
-            let existingKeyToToggle = null;
-            Object.keys(gridData[rowKey]).forEach((existKey) => {
-              const existStep = parseFloat(existKey);
-              const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
-              if (targetStep >= existStep && targetStep < existStep + existDur - 0.001) {
-                existingKeyToToggle = existKey;
-              }
-            });
-
-            if (existingKeyToToggle !== null) {
-              // 이미 있는 타악기 노트를 클릭한 경우: 재클릭 삭제
-              delete gridData[rowKey][existingKeyToToggle];
+            if (gridData[rowKey][targetStep]) {
+              delete gridData[rowKey][targetStep];
             } else {
-              // 새 타악기 노트 추가 시: 입력하려는 영역(targetStep ~ targetStep + selectedDuration)과 겹치는 기존 노트 자동 삭제
-              const newStart = targetStep;
-              const newEnd = targetStep + selectedDuration;
-
-              Object.keys(gridData[rowKey]).forEach((existKey) => {
-                const existStep = parseFloat(existKey);
-                const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
-                const existEnd = existStep + existDur;
-
-                if (Math.max(newStart, existStep) < Math.min(newEnd, existEnd) - 0.001) {
-                  delete gridData[rowKey][existKey];
-                }
-              });
-
-              gridData[rowKey][targetStep] = { duration: selectedDuration };
+              gridData[rowKey][targetStep] = { duration: 0.5 };
               playPercussion(pTrack.id);
             }
             renderGrid();
@@ -1154,9 +1173,45 @@
         percGrid.appendChild(row);
       });
 
-      // 그리드 렌더링 후 스크롤바 유무에 따라 상단 헤더 우측 여백 업데이트
       setTimeout(updateScrollSpacer, 0);
     }
+
+    function handleGlobalMove(clientX) {
+      if (!activeResizeState) return;
+
+      const deltaX = clientX - activeResizeState.startClientX;
+      const deltaBeats = deltaX / activeResizeState.cellWidthPx;
+
+      let newDuration = activeResizeState.startDur + Math.round(deltaBeats * 4) * 0.25;
+      newDuration = Math.max(0.25, Math.min(activeResizeState.maxDuration, newDuration));
+
+      activeResizeState.currentDuration = newDuration;
+
+      if (activeResizeState.targetElem) {
+        activeResizeState.targetElem.style.width = `${newDuration * 100}%`;
+      }
+    }
+
+    function handleGlobalEnd() {
+      if (activeResizeState) {
+        const { rowKey, startStep, currentDuration } = activeResizeState;
+        if (currentDuration && gridData[rowKey] && gridData[rowKey][startStep]) {
+          gridData[rowKey][startStep].duration = currentDuration;
+        }
+        activeResizeState = null;
+        renderGrid();
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => handleGlobalMove(e.clientX));
+    window.addEventListener('mouseup', handleGlobalEnd);
+
+    window.addEventListener('touchmove', (e) => {
+      if (activeResizeState && e.touches.length > 0) {
+        handleGlobalMove(e.touches[0].clientX);
+      }
+    }, { passive: true });
+    window.addEventListener('touchend', handleGlobalEnd);
 
     function startPlayback() {
       if (isPlaying) return;
@@ -1248,11 +1303,13 @@
       bpm = song.bpm;
       if (song.scale) currentScale = song.scale;
       if (song.octaves) currentOctaves = song.octaves;
+      if (song.inst) currentInstrument = song.inst;
 
       const timeSigSelect = document.getElementById('timeSigSelect');
       const measuresSelect = document.getElementById('measuresSelect');
       const scaleSelect = document.getElementById('scaleSelect');
       const octaveSelect = document.getElementById('octaveSelect');
+      const instSelect = document.getElementById('instSelect');
       const bpmRange = document.getElementById('bpmRange');
       const bpmVal = document.getElementById('bpmVal');
 
@@ -1260,6 +1317,7 @@
       if (measuresSelect) measuresSelect.value = currentMeasures;
       if (scaleSelect) scaleSelect.value = currentScale;
       if (octaveSelect) octaveSelect.value = currentOctaves;
+      if (instSelect) instSelect.value = currentInstrument;
       if (bpmRange) bpmRange.value = bpm;
       if (bpmVal) bpmVal.innerText = bpm;
 
@@ -1279,7 +1337,7 @@
           'C6': 84, 'B5': 83, 'A#5': 82, 'A5': 81, 'G#5': 80, 'G5': 79, 'F#5': 78, 'F5': 77, 'E5': 76, 'D#5': 75, 'D5': 74, 'C#5': 73, 'C5': 72,
           'B4': 71, 'A#4': 70, 'A4': 69, 'G#4': 68, 'G4': 67, 'F#4': 66, 'F4': 65, 'E4': 64, 'D#4': 63, 'D4': 62, 'C#4': 61, 'C4': 60,
           'B3': 59, 'A#3': 58, 'A3': 57, 'G#3': 56, 'G3': 55, 'F#3': 54, 'F3': 53, 'E3': 52, 'D#3': 51, 'D3': 50, 'C#3': 49, 'C3': 48,
-          'B2': 47, 'A#2': 46, 'A2': 45, 'G#2': 44, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D#2': 39, 'D2': 38, 'C#2': 37, 'C2': 36
+          'B2': 47, 'A#2': 46, 'A2': 45, 'G#2': 44, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D2': 39, 'D2': 38, 'C#2': 37, 'C2': 36
         };
 
         const ticksPerQuarter = 480;
@@ -1559,15 +1617,6 @@
           controlsToolbar.classList.toggle('hidden');
         });
       }
-
-      window.addEventListener('click', (e) => {
-        if (sampleBtn && sampleMenu && !sampleBtn.contains(e.target) && !sampleMenu.contains(e.target)) {
-          sampleMenu.classList.add('hidden');
-        }
-        if (exportBtn && exportMenu && !exportBtn.contains(e.target) && !exportMenu.contains(e.target)) {
-          exportMenu.classList.add('hidden');
-        }
-      });
 
       renderGrid();
     });
