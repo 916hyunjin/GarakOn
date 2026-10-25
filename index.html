@@ -355,7 +355,7 @@
           const pitch = notePitchClass + o;
           fullList.push({
             name: pitch,
-            label: o === 4 ? n.label : `${n.label}(${o}옥)`,
+            label: o === 4 ? n.label : `${n.label}(${o})`,
             color: n.color
           });
         });
@@ -1159,8 +1159,12 @@
 
       percTracks.forEach((pTrack) => {
         const rowKey = `perc_${pTrack.id}`;
-        if (gridData[rowKey] && gridData[rowKey][currentSubStep]) {
-          playPercussion(pTrack.id);
+        if (gridData[rowKey]) {
+          Object.keys(gridData[rowKey]).forEach((key) => {
+            if (Math.abs(parseFloat(key) - currentSubStep) < 0.01 && gridData[rowKey][key]) {
+              playPercussion(pTrack.id);
+            }
+          });
         }
       });
     }
