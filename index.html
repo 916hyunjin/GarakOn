@@ -638,30 +638,41 @@
       }
     };
 
-    /* URL Hash 실시간 동기화 및 음악 공유 인코딩/디코딩 지원 함수 */
+    /* URL 쿼리 파라미터 기반 음악 데이터 동기화 (깃허브 호스팅 환경 호환성 최적화) */
+    function getEncodedMusicData() {
+      const stateObj = {
+        timeSig: currentTimeSig,
+        measures: currentMeasures,
+        bpm: bpm,
+        scale: currentScale,
+        octaves: currentOctaves,
+        inst: currentInstrument,
+        gridData: gridData
+      };
+      return encodeURIComponent(JSON.stringify(stateObj));
+    }
+
     function updateUrlHash() {
       try {
-        const stateObj = {
-          timeSig: currentTimeSig,
-          measures: currentMeasures,
-          bpm: bpm,
-          scale: currentScale,
-          octaves: currentOctaves,
-          inst: currentInstrument,
-          gridData: gridData
-        };
-        const jsonStr = JSON.stringify(stateObj);
-        const encodedData = encodeURIComponent(jsonStr);
-        window.history.replaceState(null, '', '#data=' + encodedData);
+        const encodedData = getEncodedMusicData();
+        const newUrl = window.location.pathname + '?data=' + encodedData;
+        window.history.replaceState(null, '', newUrl);
       } catch (e) {
-        console.warn("URL Hash update failed:", e);
+        console.warn("URL update failed:", e);
       }
     }
 
     function loadStateFromUrl() {
-      if (!window.location.hash || !window.location.hash.startsWith('#data=')) return false;
       try {
-        const encodedData = window.location.hash.substring(6);
+        const urlParams = new URLSearchParams(window.location.search);
+        let encodedData = urlParams.get('data');
+
+        if (!encodedData && window.location.hash && window.location.hash.startsWith('#data=')) {
+          encodedData = window.location.hash.substring(6);
+        }
+
+        if (!encodedData) return false;
+
         const jsonStr = decodeURIComponent(encodedData);
         const loaded = JSON.parse(jsonStr);
         if (loaded && loaded.gridData) {
@@ -1901,16 +1912,17 @@
 
     function shareUrlLink() {
       updateUrlHash();
-      const shareUrlStr = window.location.href;
-      
+      const encodedData = getEncodedMusicData();
+      const fullShareUrl = window.location.origin + window.location.pathname + '?data=' + encodedData;
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(shareUrlStr).then(() => {
-          showToast('음악 정보가 담긴 공유 링크가 클립보드에 복사되었습니다.');
+        navigator.clipboard.writeText(fullShareUrl).then(() => {
+          showToast('작성한 음악 정보가 포함된 링크가 복사되었습니다!');
         }).catch(() => {
-          fallbackCopyTextToClipboard(shareUrlStr);
+          fallbackCopyTextToClipboard(fullShareUrl);
         });
       } else {
-        fallbackCopyTextToClipboard(shareUrlStr);
+        fallbackCopyTextToClipboard(fullShareUrl);
       }
     }
 
@@ -1921,7 +1933,7 @@
       dummy.select();
       document.execCommand('copy');
       document.body.removeChild(dummy);
-      showToast('음악 정보가 담긴 공유 링크가 클립보드에 복사되었습니다.');
+      showToast('작성한 음악 정보가 포함된 링크가 복사되었습니다!');
     }
 
     function showToast(msg) {
