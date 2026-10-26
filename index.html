@@ -699,11 +699,11 @@
       return false;
     }
 
-    function playNote(pitch, duration = 0.5) {
-      const ctx = getAudioContext();
+    function playNote(pitch, duration = 0.5, customCtx = null, startTime = 0) {
+      const ctx = customCtx || getAudioContext();
       const freq = pitchFrequencies[pitch];
       if (!freq) return;
-      const now = ctx.currentTime;
+      const now = customCtx ? startTime : ctx.currentTime;
 
       if (currentInstrument === 'piano') {
         const oscFund = ctx.createOscillator();   
@@ -726,7 +726,7 @@
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(freq * 3.5, now);
-        filter.frequency.exponentialRampToValueAtTime(freq * 1.5, now + duration * 1.5);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 1.5), now + duration * 1.5);
 
         gainFund.gain.setValueAtTime(0.7, now);
         gainFund.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.0));
@@ -851,9 +851,9 @@
       osc.stop(now + duration * 1.5);
     }
 
-    function playPercussion(type) {
-      const ctx = getAudioContext();
-      const now = ctx.currentTime;
+    function playPercussion(type, customCtx = null, startTime = 0) {
+      const ctx = customCtx || getAudioContext();
+      const now = customCtx ? startTime : ctx.currentTime;
       const trackObj = percTracks.find(p => p.id === type);
       const instrument = trackObj ? trackObj.selected : '';
 
@@ -951,9 +951,9 @@
           filter.type = 'bandpass';
           filter.frequency.setValueAtTime(1200, now);
 
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.8, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          const noiseGain = ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.8, now);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
           noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
           noise.start(now); noise.stop(now + 0.12);
@@ -1743,8 +1743,144 @@
       showToast(`'${song.name}' 예시곡을 불러왔습니다.`);
     }
 
-    function exportToWav() {
-      showToast('WAV 오디오 파일 다운로드가 시작되었습니다.');
+    /* OfflineAudioContext를 이용한 실제 WAV 오디오 파일 내보내기 구현 */
+    async function exportToWav() {
+      try {
+        showToast("WAV 오디오 파일 생성 중...");
+        
+        const sampleRate = 44100;
+        const totalQuarterBeats = getTotalSteps();
+        const quarterDuration = 60 / bpm;
+        const totalDurationSec = totalQuarterBeats * quarterDuration + 1.5; 
+        
+        const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
+          2, 
+          Math.ceil(sampleRate * totalDurationSec), 
+          sampleRate
+        );
+
+        const activeNotes = getActiveNoteList();
+
+        activeNotes.forEach((n) => {
+          const rowKey = n.name;
+          if (gridData[rowKey]) {
+            Object.keys(gridData[rowKey]).forEach((stepStr) => {
+              const startStep = parseFloat(stepStr);
+              const noteData = gridData[rowKey][stepStr];
+              const startTime = startStep * quarterDuration;
+              const beatDuration = (noteData.duration || 1) * quarterDuration;
+              playNote(rowKey, beatDuration, offlineCtx, startTime);
+            });
+          }
+        });
+
+        percTracks.forEach((pTrack) => {
+          const rowKey = `perc_${pTrack.id}`;
+          if (gridData[rowKey]) {
+            Object.keys(gridData[rowKey]).forEach((stepStr) => {
+              const startStep = parseFloat(stepStr);
+              if (gridData[rowKey][stepStr]) {
+                const startTime = startStep * quarterDuration;
+                playPercussion(pTrack.id, offlineCtx, startTime);
+              }
+            });
+          }
+        });
+
+        const renderedBuffer = await offlineCtx.startRendering();
+        
+        // AudioBuffer를 RIFF WAV 포맷 바이트 배열로 변환
+        const wavBuffer = audioBufferToWav(renderedBuffer);
+        const blob = new Blob([wavBuffer], { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `garakon_${Date.now()}.wav`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast("WAV 파일 다운로드 완료!");
+      } catch (err) {
+        console.error(err);
+        showToast("WAV 파일 생성 중 오류가 발생했습니다.");
+      }
+    }
+
+    // AudioBuffer -> RIFF WAV 변환 헬퍼 함수
+    function audioBufferToWav(buffer) {
+      const numChannels = buffer.numberOfChannels;
+      const sampleRate = buffer.sampleRate;
+      const format = 1; // PCM
+      const bitDepth = 16;
+      
+      let result;
+      if (numChannels === 2) {
+        const left = buffer.getChannelData(0);
+        const right = buffer.getChannelData(1);
+        result = interleave(left, right);
+      } else {
+        result = buffer.getChannelData(0);
+      }
+
+      const dataLength = result.length * 2;
+      const bufferLength = 44 + dataLength;
+      const arrayBuffer = new ArrayBuffer(bufferLength);
+      const view = new DataView(arrayBuffer);
+
+      /* RIFF identifier */
+      writeString(view, 0, 'RIFF');
+      /* RIFF chunk length */
+      view.setUint32(4, 36 + dataLength, true);
+      /* RIFF type */
+      writeString(view, 8, 'WAVE');
+      /* format chunk identifier */
+      writeString(view, 12, 'fmt ');
+      /* format chunk length */
+      view.setUint32(16, 16, true);
+      /* sample format (raw) */
+      view.setUint16(20, format, true);
+      /* channel count */
+      view.setUint16(22, numChannels, true);
+      /* sample rate */
+      view.setUint32(24, sampleRate, true);
+      /* byte rate (sample rate * block align) */
+      view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
+      /* block align (channel count * bytes per sample) */
+      view.setUint16(32, numChannels * (bitDepth / 8), true);
+      /* bits per sample */
+      view.setUint16(34, bitDepth, true);
+      /* data chunk identifier */
+      writeString(view, 36, 'data');
+      /* data chunk length */
+      view.setUint32(40, dataLength, true);
+
+      // Write PCM audio samples
+      let offset = 44;
+      for (let i = 0; i < result.length; i++, offset += 2) {
+        const s = Math.max(-1, Math.min(1, result[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+
+      return arrayBuffer;
+    }
+
+    function interleave(inputL, inputR) {
+      const length = inputL.length + inputR.length;
+      const result = new Float32Array(length);
+      let index = 0;
+      let inputIndex = 0;
+
+      while (index < length) {
+        result[index++] = inputL[inputIndex];
+        result[index++] = inputR[inputIndex];
+        inputIndex++;
+      }
+      return result;
+    }
+
+    function writeString(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
     }
 
     /* BandLab 호환 표준 MIDI 생성 함수 */
