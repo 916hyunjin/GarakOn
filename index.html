@@ -1743,11 +1743,17 @@
       showToast(`'${song.name}' 예시곡을 불러왔습니다.`);
     }
 
-    /* OfflineAudioContext를 이용한 실제 WAV 오디오 파일 내보내기 구현 */
+    /* OfflineAudioContext를 이용한 실제 WAV 오디오 파일 내보내기 (GitHub Pages 호환 보완) */
     async function exportToWav() {
       try {
         showToast("WAV 오디오 파일 생성 중...");
         
+        // 1. HTTPS/GitHub Pages 환경 오디오 컨텍스트 강제 활성화 (보안 정책 통과)
+        const mainCtx = getAudioContext();
+        if (mainCtx.state === 'suspended') {
+          await mainCtx.resume();
+        }
+
         const sampleRate = 44100;
         const totalQuarterBeats = getTotalSteps();
         const quarterDuration = 60 / bpm;
@@ -1761,6 +1767,7 @@
 
         const activeNotes = getActiveNoteList();
 
+        // 2. 멜로디 노트 오프라인 스케줄링
         activeNotes.forEach((n) => {
           const rowKey = n.name;
           if (gridData[rowKey]) {
@@ -1774,6 +1781,7 @@
           }
         });
 
+        // 3. 타악기 노트 오프라인 스케줄링
         percTracks.forEach((pTrack) => {
           const rowKey = `perc_${pTrack.id}`;
           if (gridData[rowKey]) {
@@ -1787,9 +1795,8 @@
           }
         });
 
+        // 4. 오프라인 렌더링 수행 및 WAV 인코딩
         const renderedBuffer = await offlineCtx.startRendering();
-        
-        // AudioBuffer를 RIFF WAV 포맷 바이트 배열로 변환
         const wavBuffer = audioBufferToWav(renderedBuffer);
         const blob = new Blob([wavBuffer], { type: 'audio/wav' });
         const url = URL.createObjectURL(blob);
@@ -1800,7 +1807,7 @@
         URL.revokeObjectURL(url);
         showToast("WAV 파일 다운로드 완료!");
       } catch (err) {
-        console.error(err);
+        console.error("WAV Export Error:", err);
         showToast("WAV 파일 생성 중 오류가 발생했습니다.");
       }
     }
