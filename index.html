@@ -156,11 +156,91 @@
     </div>
   </header>
 
-  <!-- Controls Toolbar -->
+  <!-- Mobile Collapsible Settings Bar (모바일 전용 설정바) -->
+  <section id="mobileSettingsBar" class="bg-sky-50 border-b border-sky-200 px-3 py-2 shadow-inner lg:hidden hidden">
+    <div class="flex flex-col gap-2 text-xs">
+      <!-- 음길이 선택 (풀네임 적용) -->
+      <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+        <span class="text-[11px] font-bold text-sky-800 shrink-0">음길이:</span>
+        <div class="flex items-center bg-white p-1 rounded-xl gap-1 shrink-0 durationPickerContainer border border-sky-200 overflow-x-auto no-scrollbar">
+          <button data-dur="0.25" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">♬ 16분음표</button>
+          <button data-dur="0.5" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">♪ 8분음표</button>
+          <button data-dur="1" class="dur-btn active-dur px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-600 text-white whitespace-nowrap">♩ 4분음표</button>
+          <button data-dur="1.5" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">♩. 점 4분음표</button>
+          <button data-dur="2" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">𝅗𝅥 2분음표</button>
+          <button data-dur="3" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">♩. 점 2분음표</button>
+          <button data-dur="4" class="dur-btn px-2 py-1 rounded-lg text-[10px] font-bold text-slate-600 whitespace-nowrap">𝅝 온음표</button>
+        </div>
+      </div>
+
+      <!-- 드롭다운 설정 옵션들 -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">악기:</span>
+          <select class="instSelect bg-transparent text-slate-800 font-bold text-[11px] focus:outline-none">
+            <option value="piano">🎹 피아노</option>
+            <option value="strings">🎻 현악기</option>
+            <option value="woodwind">🎷 관악기</option>
+            <option value="marimba">🪵 마림바</option>
+            <option value="kalimba">📻 칼림바</option>
+            <option value="synth">𝎛️ 신디사이저</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">음계:</span>
+          <select class="scaleSelect bg-transparent text-slate-800 font-bold text-[11px] focus:outline-none">
+            <option value="diatonic">7음계 (도레미파솔라시)</option>
+            <option value="pentatonic">5음계 (도레미솔라)</option>
+            <option value="chromatic">12음계 (반음 포함)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">옥타브:</span>
+          <select class="octaveSelect bg-transparent text-slate-800 font-bold text-[11px] focus:outline-none">
+            <option value="1">1옥타브 (C4~B4)</option>
+            <option value="2">2옥타브 (C4~B5)</option>
+            <option value="3">3옥타브 (C3~B5)</option>
+            <option value="4">4옥타브 (C2~B5)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">박자:</span>
+          <select class="timeSigSelect bg-transparent text-slate-800 font-bold text-[11px] focus:outline-none">
+            <option value="4/4">4/4 박자</option>
+            <option value="2/4">2/4 박자</option>
+            <option value="3/4">3/4 박자</option>
+            <option value="6/8">6/8 박자</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">마디:</span>
+          <select class="measuresSelect bg-transparent text-slate-800 font-bold text-[11px] focus:outline-none">
+            <option value="2">2마디</option>
+            <option value="4" selected>4마디</option>
+            <option value="8">8마디</option>
+            <option value="12">12마디</option>
+            <option value="16">16마디</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-sky-200 shrink-0">
+          <span class="font-bold text-slate-500 text-[10px]">속도:</span>
+          <input type="range" class="bpmRange w-12 accent-emerald-600 cursor-pointer" min="50" max="200" value="120">
+          <span class="bpmVal font-extrabold text-slate-800 text-[11px] w-5">120</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls Toolbar (PC & Tablet 전용, 풀네임 적용) -->
   <section id="controlsToolbar" class="bg-white border-b border-slate-200 px-3 py-2 shadow-2xs hidden lg:block transition-all">
     <div class="max-w-full mx-auto flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
       <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-        <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 shrink-0" id="durationPicker">
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 shrink-0 durationPickerContainer">
           <span class="text-[11px] sm:text-xs font-bold text-slate-500 px-1.5">음길이:</span>
           
           <button data-dur="0.25" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
@@ -185,7 +265,7 @@
           </button>
 
           <button data-dur="1.5" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
-            <span>♩. 점4분음표</span>
+            <span>♩. 점 4분음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
               <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
               <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" /></svg>
@@ -201,7 +281,7 @@
           </button>
 
           <button data-dur="3" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
-            <span>♩. 점2분음표</span>
+            <span>♩. 점 2분음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
               <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
               <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
@@ -224,7 +304,7 @@
       <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">악기:</span>
-          <select id="instSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
+          <select class="instSelect bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="piano">🎹 피아노</option>
             <option value="strings">🎻 현악기</option>
             <option value="woodwind">🎷 관악기</option>
@@ -236,7 +316,7 @@
 
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">음계:</span>
-          <select id="scaleSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
+          <select class="scaleSelect bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="diatonic">7음계 (도레미파솔라시)</option>
             <option value="pentatonic">5음계 (도레미솔라)</option>
             <option value="chromatic">12음계 (반음 포함)</option>
@@ -245,7 +325,7 @@
 
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">옥타브:</span>
-          <select id="octaveSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
+          <select class="octaveSelect bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="1">1옥타브 (C4~B4)</option>
             <option value="2">2옥타브 (C4~B5)</option>
             <option value="3">3옥타브 (C3~B5)</option>
@@ -255,7 +335,7 @@
 
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">박자:</span>
-          <select id="timeSigSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
+          <select class="timeSigSelect bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="4/4">4/4 박자</option>
             <option value="2/4">2/4 박자</option>
             <option value="3/4">3/4 박자</option>
@@ -265,7 +345,7 @@
 
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">마디:</span>
-          <select id="measuresSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
+          <select class="measuresSelect bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
             <option value="2">2마디</option>
             <option value="4" selected>4마디</option>
             <option value="8">8마디</option>
@@ -276,8 +356,8 @@
 
         <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">속도:</span>
-          <input type="range" id="bpmRange" min="50" max="200" value="120" class="w-14 sm:w-16 accent-emerald-600 cursor-pointer">
-          <span id="bpmVal" class="font-extrabold text-slate-800 text-xs w-6">120</span>
+          <input type="range" class="bpmRange w-14 sm:w-16 accent-emerald-600 cursor-pointer" min="50" max="200" value="120">
+          <span class="bpmVal font-extrabold text-slate-800 text-xs w-6">120</span>
         </div>
       </div>
     </div>
@@ -560,6 +640,10 @@
       } catch (e) {}
     }
 
+    function syncSelectControls(selector, value) {
+      document.querySelectorAll(selector).forEach(el => { el.value = value; });
+    }
+
     function loadStateFromUrl() {
       if (!window.location.hash || !window.location.hash.startsWith('#data=')) return false;
       try {
@@ -573,13 +657,13 @@
           if (loaded.octaves) currentOctaves = loaded.octaves;
           if (loaded.inst) currentInstrument = loaded.inst;
 
-          document.getElementById('timeSigSelect').value = currentTimeSig;
-          document.getElementById('measuresSelect').value = currentMeasures;
-          document.getElementById('scaleSelect').value = currentScale;
-          document.getElementById('octaveSelect').value = currentOctaves;
-          document.getElementById('instSelect').value = currentInstrument;
-          document.getElementById('bpmRange').value = bpm;
-          document.getElementById('bpmVal').innerText = bpm;
+          syncSelectControls('.timeSigSelect', currentTimeSig);
+          syncSelectControls('.measuresSelect', currentMeasures);
+          syncSelectControls('.scaleSelect', currentScale);
+          syncSelectControls('.octaveSelect', currentOctaves);
+          syncSelectControls('.instSelect', currentInstrument);
+          document.querySelectorAll('.bpmRange').forEach(el => el.value = bpm);
+          document.querySelectorAll('.bpmVal').forEach(el => el.innerText = bpm);
           return true;
         }
       } catch (e) {}
@@ -1288,13 +1372,13 @@
       if (song.octaves) currentOctaves = song.octaves;
       if (song.inst) currentInstrument = song.inst;
 
-      document.getElementById('timeSigSelect').value = currentTimeSig;
-      document.getElementById('measuresSelect').value = currentMeasures;
-      document.getElementById('scaleSelect').value = currentScale;
-      document.getElementById('octaveSelect').value = currentOctaves;
-      document.getElementById('instSelect').value = currentInstrument;
-      document.getElementById('bpmRange').value = bpm;
-      document.getElementById('bpmVal').innerText = bpm;
+      syncSelectControls('.timeSigSelect', currentTimeSig);
+      syncSelectControls('.measuresSelect', currentMeasures);
+      syncSelectControls('.scaleSelect', currentScale);
+      syncSelectControls('.octaveSelect', currentOctaves);
+      syncSelectControls('.instSelect', currentInstrument);
+      document.querySelectorAll('.bpmRange').forEach(el => el.value = bpm);
+      document.querySelectorAll('.bpmVal').forEach(el => el.innerText = bpm);
 
       renderGrid();
       showToast(`'${song.name}' 예시곡을 불러왔습니다.`);
@@ -1504,17 +1588,24 @@
     window.addEventListener('DOMContentLoaded', () => {
       window.addEventListener('resize', updateScrollSpacer);
 
-      document.querySelectorAll('.dur-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.dur-btn').forEach((b) => {
-            b.classList.remove('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
-            b.classList.add('text-slate-600');
-            b.querySelectorAll('svg').forEach(s => s.classList.replace('text-amber-300', 'text-amber-600'));
+      // 음길이 버튼 바인딩 (PC & 모바일 공통)
+      document.querySelectorAll('.durationPickerContainer').forEach(container => {
+        container.querySelectorAll('.dur-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const dur = parseFloat(btn.dataset.dur);
+            selectedDuration = dur;
+            
+            document.querySelectorAll('.dur-btn').forEach(b => {
+              const bDur = parseFloat(b.dataset.dur);
+              if (bDur === dur) {
+                b.classList.add('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
+                b.classList.remove('text-slate-600');
+              } else {
+                b.classList.remove('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
+                b.classList.add('text-slate-600');
+              }
+            });
           });
-          btn.classList.add('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
-          btn.classList.remove('text-slate-600');
-          btn.querySelectorAll('svg').forEach(s => s.classList.replace('text-amber-600', 'text-amber-300'));
-          selectedDuration = parseFloat(btn.dataset.dur);
         });
       });
 
@@ -1549,12 +1640,26 @@
       });
 
       safeAddListener('clearBtn', 'click', () => { saveStateForUndo(); gridData = {}; renderGrid(); showToast('악보가 깨끗이 지워졌습니다.'); });
-      safeAddListener('instSelect', 'change', (e) => { currentInstrument = e.target.value; updateUrlHash(); });
-      safeAddListener('scaleSelect', 'change', (e) => { currentScale = e.target.value; renderGrid(); });
-      safeAddListener('octaveSelect', 'change', (e) => { currentOctaves = parseInt(e.target.value); renderGrid(); });
-      safeAddListener('timeSigSelect', 'change', (e) => { currentTimeSig = e.target.value; renderGrid(); });
-      safeAddListener('measuresSelect', 'change', (e) => { currentMeasures = parseInt(e.target.value); renderGrid(); });
-      safeAddListener('bpmRange', 'input', (e) => { bpm = parseInt(e.target.value); document.getElementById('bpmVal').innerText = bpm; updateUrlHash(); if (isPlaying) { stopPlayback(); startPlayback(); } });
+
+      // 동기화 이벤트 바인딩
+      document.querySelectorAll('.instSelect').forEach(el => el.addEventListener('change', (e) => { currentInstrument = e.target.value; syncSelectControls('.instSelect', currentInstrument); updateUrlHash(); }));
+      document.querySelectorAll('.scaleSelect').forEach(el => el.addEventListener('change', (e) => { currentScale = e.target.value; syncSelectControls('.scaleSelect', currentScale); renderGrid(); }));
+      document.querySelectorAll('.octaveSelect').forEach(el => el.addEventListener('change', (e) => { currentOctaves = parseInt(e.target.value); syncSelectControls('.octaveSelect', currentOctaves); renderGrid(); }));
+      document.querySelectorAll('.timeSigSelect').forEach(el => el.addEventListener('change', (e) => { currentTimeSig = e.target.value; syncSelectControls('.timeSigSelect', currentTimeSig); renderGrid(); }));
+      document.querySelectorAll('.measuresSelect').forEach(el => el.addEventListener('change', (e) => { currentMeasures = parseInt(e.target.value); syncSelectControls('.measuresSelect', currentMeasures); renderGrid(); }));
+      document.querySelectorAll('.bpmRange').forEach(el => el.addEventListener('input', (e) => { 
+        bpm = parseInt(e.target.value); 
+        document.querySelectorAll('.bpmRange').forEach(b => b.value = bpm);
+        document.querySelectorAll('.bpmVal').forEach(v => v.innerText = bpm); 
+        updateUrlHash(); 
+        if (isPlaying) { stopPlayback(); startPlayback(); } 
+      }));
+
+      // 모바일 헤더 슬라이더 버튼 토글 (상단 바 접기/펴기)
+      const mobileSettingsBar = document.getElementById('mobileSettingsBar');
+      safeAddListener('mobileSettingsToggleBtn', 'click', () => { 
+        if (mobileSettingsBar) mobileSettingsBar.classList.toggle('hidden'); 
+      });
 
       const sampleBtn = document.getElementById('sampleBtn');
       const sampleMenu = document.getElementById('sampleMenu');
@@ -1594,13 +1699,13 @@
                 if (loaded.octaves) currentOctaves = loaded.octaves;
                 if (loaded.inst) currentInstrument = loaded.inst;
 
-                document.getElementById('timeSigSelect').value = currentTimeSig;
-                document.getElementById('measuresSelect').value = currentMeasures;
-                document.getElementById('scaleSelect').value = currentScale;
-                document.getElementById('octaveSelect').value = currentOctaves;
-                document.getElementById('instSelect').value = currentInstrument;
-                document.getElementById('bpmRange').value = bpm;
-                document.getElementById('bpmVal').innerText = bpm;
+                syncSelectControls('.timeSigSelect', currentTimeSig);
+                syncSelectControls('.measuresSelect', currentMeasures);
+                syncSelectControls('.scaleSelect', currentScale);
+                syncSelectControls('.octaveSelect', currentOctaves);
+                syncSelectControls('.instSelect', currentInstrument);
+                document.querySelectorAll('.bpmRange').forEach(el => el.value = bpm);
+                document.querySelectorAll('.bpmVal').forEach(el => el.innerText = bpm);
 
                 renderGrid();
                 showToast('프로젝트 파일을 성공적으로 불러왔습니다.');
