@@ -20,38 +20,18 @@
       transition: background-color 0.1s ease;
       touch-action: manipulation;
     }
-    /* 음표 클릭/생성 시 자석처럼 탁 붙는 스냅 애니메이션 */
     @keyframes snapIn {
-      0% {
-        transform: scale(0.85);
-        opacity: 0.6;
-      }
-      60% {
-        transform: scale(1.04);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+      0% { transform: scale(0.85); opacity: 0.6; }
+      60% { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
     .snap-note {
       animation: snapIn 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .smooth-scroll {
-      -webkit-overflow-scrolling: touch;
-    }
-    /* 스크롤바 생겨도 상단 헤더와 그리드 칸 위치가 일치하도록 설정 */
-    .has-stable-gutter {
-      scrollbar-gutter: stable;
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .smooth-scroll { -webkit-overflow-scrolling: touch; }
+    .has-stable-gutter { scrollbar-gutter: stable; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between select-none overflow-x-hidden">
@@ -60,15 +40,23 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-3 py-2 shadow-2xs">
     <div class="max-w-full mx-auto flex items-center justify-between gap-2">
       
-      <!-- Brand & Title (Left) -->
+      <!-- Brand & Title -->
       <div class="flex items-center gap-2 shrink-0">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-base sm:text-xl font-black shadow-sm shrink-0">
-          <i class="fa-solid fa-music"></i>
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-sm shrink-0 bg-emerald-600 flex items-center justify-center">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="20" fill="#059669"/>
+            <path d="M20 70C20 64.4772 24.4772 60 30 60H35C40.5228 60 45 55.5228 45 50V45C45 39.4772 49.4772 35 55 35H60C65.5228 35 70 30.5228 70 25V20C70 14.4772 74.4772 10 80 10" stroke="#FBBF24" stroke-width="12" stroke-linecap="round"/>
+            <circle cx="25" cy="35" r="5" fill="#38BDF8"/>
+            <circle cx="40" cy="25" r="5" fill="#F43F5E"/>
+            <circle cx="55" cy="18" r="5" fill="#A855F7"/>
+            <rect x="50" y="65" width="16" height="25" rx="8" fill="#38BDF8"/>
+            <rect x="70" y="55" width="16" height="35" rx="8" fill="#C084FC"/>
+            <rect x="20" y="60" width="25" height="25" rx="8" fill="#34D399"/>
+          </svg>
         </div>
-        <!-- 헤더 문구 -->
         <div class="flex flex-col justify-center">
-          <h1 class="text-xs sm:text-xl font-black text-slate-900 tracking-tight leading-none whitespace-nowrap">
-            가락온 <span class="text-xs font-normal text-slate-500 hidden sm:inline">(GarakOn)</span>
+          <h1 class="text-xs sm:text-xl font-black text-emerald-800 tracking-tight leading-none whitespace-nowrap">
+            가락온 GarakOn
           </h1>
           <p class="text-[10px] sm:text-sm font-extrabold text-slate-700 whitespace-nowrap leading-tight mt-0.5">
             상상을 가락으로
@@ -76,12 +64,9 @@
         </div>
       </div>
 
-      <!-- Controls Right Group (PC에서는 붙어서 정돈, 모바일에서는 스크롤) -->
+      <!-- Controls Right Group -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink min-w-0 justify-end">
-        
-        <!-- 1. 스크롤 가능한 기능 버튼 그룹 (재생/정지/반복/삭제/악보) -->
         <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 shrink min-w-0">
-          <!-- Play / Stop -->
           <button id="playBtn" class="flex items-center gap-1 px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all text-xs sm:text-sm cursor-pointer touch-manipulation shrink-0">
             <i class="fa-solid fa-play text-xs"></i>
           </button>
@@ -91,23 +76,27 @@
 
           <!-- Loop Mode Toggle Button -->
           <button id="loopToggleBtn" class="flex items-center justify-center p-2 sm:px-3.5 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation border border-slate-200 shrink-0" title="반복 재생 설정">
-            <i id="loopIcon" class="fa-solid fa-rotate-right text-slate-500 text-xs sm:text-sm"></i>
+            <i id="loopIcon" class="fa-solid fa-arrows-rotate text-slate-500 text-xs sm:text-sm"></i>
           </button>
 
-          <!-- Clear Button -->
+          <!-- Undo / Redo Buttons -->
+          <button id="undoBtn" class="flex items-center justify-center p-2 sm:px-3 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation border border-slate-200 shrink-0" title="실행 취소 (Ctrl+Z)">
+            <i class="fa-solid fa-rotate-left text-slate-600 text-xs"></i>
+          </button>
+          <button id="redoBtn" class="flex items-center justify-center p-2 sm:px-3 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation border border-slate-200 shrink-0" title="다시 실행 (Ctrl+Y)">
+            <i class="fa-solid fa-arrow-rotate-right text-slate-600 text-xs"></i>
+          </button>
+
           <button id="clearBtn" class="flex items-center gap-1 p-2 sm:px-3 sm:py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation shrink-0" title="전체 삭제">
             <i class="fa-solid fa-trash-can text-xs"></i>
           </button>
 
-          <!-- Sheet Music Button -->
           <button id="sheetMusicBtn" class="flex items-center justify-center p-2 sm:px-3 sm:py-2.5 bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation border border-purple-200 shrink-0" title="Sheet Music">
             <i class="fa-solid fa-file-audio text-purple-600 text-xs"></i>
           </button>
         </div>
 
-        <!-- 2. 드롭다운 및 설정 버튼 그룹 (항상 고정) -->
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <!-- Mobile Toggle Settings Button -->
           <button id="mobileSettingsToggleBtn" class="lg:hidden flex items-center justify-center p-2 bg-sky-100 hover:bg-sky-200 active:bg-sky-300 text-sky-700 border border-sky-200 rounded-xl transition-all cursor-pointer touch-manipulation shadow-2xs shrink-0" title="설정 열기">
             <i class="fa-solid fa-sliders text-xs"></i>
           </button>
@@ -117,18 +106,21 @@
             <button id="sampleBtn" class="flex items-center gap-1 p-2 sm:px-3 sm:py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition-all text-xs sm:text-sm cursor-pointer touch-manipulation" title="예시곡 목록">
               <i class="fa-solid fa-music text-amber-600 text-xs"></i> <i class="fa-solid fa-chevron-down text-[9px]"></i>
             </button>
-            <div id="sampleMenu" class="hidden absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-              <button data-song="airplane" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+            <div id="sampleMenu" class="hidden absolute right-0 top-full mt-1 w-48 sm:w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+              <button data-song="airplane" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
                 ✈️ 비행기 <span class="text-[10px] text-slate-400">4/4박자</span>
               </button>
-              <button data-song="butterfly" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+              <button data-song="butterfly" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
                 🦋 나비야 <span class="text-[10px] text-slate-400">2/4박자</span>
               </button>
-              <button data-song="schoolbell" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
+              <button data-song="schoolbell" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
                 🔔 학교종 <span class="text-[10px] text-slate-400">4/4박자</span>
               </button>
-              <button data-song="arirang" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 active:bg-amber-100 text-xs sm:text-sm font-medium text-slate-700 flex items-center justify-between cursor-pointer">
+              <button data-song="arirang" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center justify-between cursor-pointer">
                 🌾 아리랑 <span class="text-[10px] text-slate-400">3/4박자</span>
+              </button>
+              <button data-song="puff" class="w-full text-left px-3 py-2.5 hover:bg-amber-50 text-xs sm:text-sm font-medium text-slate-700 flex items-center justify-between cursor-pointer">
+                🐉 퍼프와 재키 <span class="text-[10px] text-slate-400">4/4박자</span>
               </button>
             </div>
           </div>
@@ -139,19 +131,19 @@
               <i class="fa-solid fa-download text-indigo-600 text-xs"></i> <i class="fa-solid fa-chevron-down text-[9px]"></i>
             </button>
             <div id="exportMenu" class="hidden absolute right-0 top-full mt-1 w-48 sm:w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-              <button id="exportWav" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+              <button id="exportWav" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-file-audio text-indigo-500 w-4"></i> 오디오 (.wav)
               </button>
-              <button id="exportMidi" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+              <button id="exportMidi" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-file-lines text-emerald-500 w-4"></i> 미디 (.mid)
               </button>
-              <button id="saveJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+              <button id="saveJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-floppy-disk text-amber-500 w-4"></i> 백업 (.garakon)
               </button>
-              <button id="loadJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
+              <button id="loadJson" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 border-b border-slate-100 flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-folder-open text-blue-500 w-4"></i> 불러오기
               </button>
-              <button id="shareUrl" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 active:bg-indigo-100 text-xs sm:text-sm font-medium text-slate-700 flex items-center gap-2 cursor-pointer">
+              <button id="shareUrl" class="w-full text-left px-3 py-2.5 hover:bg-indigo-50 text-xs sm:text-sm font-medium text-slate-700 flex items-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-link text-purple-500 w-4"></i> 공유 링크 복사
               </button>
             </div>
@@ -167,8 +159,6 @@
   <!-- Controls Toolbar -->
   <section id="controlsToolbar" class="bg-white border-b border-slate-200 px-3 py-2 shadow-2xs hidden lg:block transition-all">
     <div class="max-w-full mx-auto flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
-      
-      <!-- Left: Note Durations Brush Picker -->
       <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
         <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 shrink-0" id="durationPicker">
           <span class="text-[11px] sm:text-xs font-bold text-slate-500 px-1.5">음길이:</span>
@@ -176,95 +166,62 @@
           <button data-dur="0.25" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>♬ 16분음표</span>
             <div class="flex items-center justify-center mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M8,8 L8,1 A7,7 0 0,1 15,8 Z" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8,8 L8,1 A7,7 0 0,1 15,8 Z" /></svg>
             </div>
           </button>
 
           <button data-dur="0.5" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>♪ 8분음표</span>
             <div class="flex items-center justify-center mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" /></svg>
             </div>
           </button>
 
           <button data-dur="1" class="dur-btn active-dur px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-2xs cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>♩ 4분음표</span>
             <div class="flex items-center justify-center mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-300" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-300" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
             </div>
           </button>
 
           <button data-dur="1.5" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>♩. 점4분음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8,8 L8,1 A7,7 0 0,1 8,15 Z" /></svg>
             </div>
           </button>
 
           <button data-dur="2" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>𝅗𝅥 2분음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
             </div>
           </button>
 
           <button data-dur="3" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>♩. 점2분음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
             </div>
           </button>
 
           <button data-dur="4" class="dur-btn px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer touch-manipulation flex flex-col items-center leading-tight">
             <span>𝅝 온음표</span>
             <div class="flex items-center justify-center gap-0.5 mt-1">
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
-              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16">
-                <circle cx="8" cy="8" r="7" />
-              </svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
+              <svg class="w-3.5 h-3.5 fill-current text-amber-600" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" /></svg>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- Right: Settings & Instruments Controls -->
       <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
-        
         <div class="flex items-center gap-1 bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
           <span class="font-bold text-slate-500 text-[11px]">악기:</span>
           <select id="instSelect" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
@@ -322,7 +279,6 @@
           <input type="range" id="bpmRange" min="50" max="200" value="120" class="w-14 sm:w-16 accent-emerald-600 cursor-pointer">
           <span id="bpmVal" class="font-extrabold text-slate-800 text-xs w-6">120</span>
         </div>
-
       </div>
     </div>
   </section>
@@ -330,52 +286,38 @@
   <!-- Main Grid Area -->
   <main class="flex-1 w-full p-2 sm:p-4 flex flex-col justify-center overflow-hidden">
     <div id="gridContainer" class="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col max-h-[80vh]">
-      
       <div class="w-full overflow-x-auto smooth-scroll flex flex-col flex-1">
-        
         <div class="flex w-full min-w-[650px] sm:min-w-[850px] bg-slate-100 border-b border-slate-200">
           <div class="w-16 sm:w-24 shrink-0"></div>
-          <div id="stepsHeader" class="flex flex-1 text-xs font-bold text-slate-500 py-1">
-            <!-- Rendered dynamically -->
-          </div>
+          <div id="stepsHeader" class="flex flex-1 text-xs font-bold text-slate-500 py-1"></div>
           <div id="headerScrollSpacer" class="w-0 shrink-0"></div>
         </div>
 
         <div id="gridScrollArea" class="flex flex-col w-full overflow-y-auto has-stable-gutter smooth-scroll min-w-[650px] sm:min-w-[850px]">
-          <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100">
-            <!-- Rendered dynamically -->
-          </div>
-
-          <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 border-t border-slate-200">
-            <!-- Rendered dynamically -->
-          </div>
+          <div id="scoreGrid" class="flex flex-col w-full divide-y divide-slate-100"></div>
+          <div id="percGrid" class="flex flex-col w-full divide-y divide-amber-100 bg-amber-50/20 border-t border-slate-200"></div>
         </div>
-
       </div>
-
     </div>
   </main>
 
-  <!-- Footer Banner -->
+  <!-- Footer -->
   <footer class="bg-slate-100 text-slate-500 py-2.5 px-4 text-center border-t border-slate-200 shrink-0">
-    <div class="flex items-center justify-center gap-1.5">
+    <div class="flex items-center justify-center gap-1.5 flex-wrap">
       <i class="fa-solid fa-graduation-cap text-slate-400 text-xs"></i>
-      <span class="font-medium text-xs tracking-wide">서울교대 박현진 스튜디오</span>
+      <span class="font-medium text-xs tracking-wide">서울교육대학교 박현진 스튜디오</span>
       <span class="text-[10px] text-slate-400 ml-0.5">| GarakOn Music Lab</span>
+      <span class="text-[10px] text-slate-400 ml-0.5">| 문의: garakon@naver.com</span>
     </div>
   </footer>
 
-  <!-- Toast Notification Box -->
   <div id="toast" class="fixed bottom-12 right-4 bg-slate-900 text-white px-3 py-2 sm:px-4 sm:py-3 rounded-xl shadow-lg text-xs font-medium transition-all opacity-0 pointer-events-none z-50 flex items-center gap-2">
     <i class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg">메시지</span>
   </div>
 
-  <!-- 오선보 악보 모달 팝업 -->
   <div id="sheetMusicModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 hidden">
     <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
-      
-      <!-- Modal Header -->
       <div class="px-4 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-music text-purple-600 text-lg"></i>
@@ -391,13 +333,9 @@
         </div>
       </div>
 
-      <!-- Modal Body (Sheet Canvas Area) -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-white flex flex-col items-center justify-start">
-        <div id="sheetContainer" class="w-full flex flex-col items-center gap-4 bg-white p-2 rounded-xl border border-slate-100">
-          <!-- VexFlow 악보가 동적으로 그려지는 영역 -->
-        </div>
+        <div id="sheetContainer" class="w-full flex flex-col items-center gap-4 bg-white p-2 rounded-xl border border-slate-100"></div>
       </div>
-
     </div>
   </div>
 
@@ -425,6 +363,32 @@
     let currentStep = 0;
     let playTimeout = null;
 
+    let undoStack = [];
+    let redoStack = [];
+    const MAX_HISTORY = 30;
+
+    function saveStateForUndo() {
+      if (undoStack.length >= MAX_HISTORY) undoStack.shift();
+      undoStack.push(JSON.stringify(gridData));
+      redoStack = []; 
+    }
+
+    function undo() {
+      if (undoStack.length === 0) { showToast("더 이상 취소할 작업이 없습니다."); return; }
+      redoStack.push(JSON.stringify(gridData));
+      gridData = JSON.parse(undoStack.pop());
+      renderGrid();
+      showToast("실행 취소 되었습니다.");
+    }
+
+    function redo() {
+      if (redoStack.length === 0) { showToast("다시 실행할 작업이 없습니다."); return; }
+      undoStack.push(JSON.stringify(gridData));
+      gridData = JSON.parse(redoStack.pop());
+      renderGrid();
+      showToast("다시 실행 되었습니다.");
+    }
+
     function getBeatsPerMeasure() {
       if (currentTimeSig === '2/4') return 2;
       if (currentTimeSig === '3/4') return 3;
@@ -432,9 +396,7 @@
       return 4;
     }
 
-    function getTotalSteps() {
-      return getBeatsPerMeasure() * currentMeasures;
-    }
+    function getTotalSteps() { return getBeatsPerMeasure() * currentMeasures; }
 
     function getNoteRowHeightClass() {
       if (currentOctaves === 2) return 'h-7 sm:h-9';
@@ -444,7 +406,6 @@
     }
 
     let gridData = {};
-
     let activeResizeState = null;
 
     const noteNamesDiatonic = [
@@ -452,16 +413,16 @@
       { name: 'A4', label: '라', color: 'bg-indigo-100 text-indigo-800', noteColor: 'bg-indigo-600 text-white' },
       { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
       { name: 'F4', label: '파', color: 'bg-emerald-100 text-emerald-800', noteColor: 'bg-emerald-600 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'E4', label: '미', color: 'bg-yellow-100 text-yellow-800', noteColor: 'bg-yellow-500 text-white' },
+      { name: 'D4', label: '레', color: 'bg-orange-100 text-orange-800', noteColor: 'bg-orange-500 text-white' },
       { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
 
     const noteNamesPentatonic = [
       { name: 'A4', label: '라', color: 'bg-indigo-100 text-indigo-800', noteColor: 'bg-indigo-600 text-white' },
       { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'E4', label: '미', color: 'bg-yellow-100 text-yellow-800', noteColor: 'bg-yellow-500 text-white' },
+      { name: 'D4', label: '레', color: 'bg-orange-100 text-orange-800', noteColor: 'bg-orange-500 text-white' },
       { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
 
@@ -473,9 +434,9 @@
       { name: 'G4', label: '솔', color: 'bg-sky-100 text-sky-800', noteColor: 'bg-sky-500 text-white' },
       { name: 'F#4', label: '파#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
       { name: 'F4', label: '파', color: 'bg-emerald-100 text-emerald-800', noteColor: 'bg-emerald-600 text-white' },
-      { name: 'E4', label: '미', color: 'bg-green-100 text-green-800', noteColor: 'bg-green-600 text-white' },
+      { name: 'E4', label: '미', color: 'bg-yellow-100 text-yellow-800', noteColor: 'bg-yellow-500 text-white' },
       { name: 'D#4', label: '레#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
-      { name: 'D4', label: '레', color: 'bg-amber-100 text-amber-800', noteColor: 'bg-amber-500 text-white' },
+      { name: 'D4', label: '레', color: 'bg-orange-100 text-orange-800', noteColor: 'bg-orange-500 text-white' },
       { name: 'C#4', label: '도#', color: 'bg-slate-200 text-slate-700', noteColor: 'bg-slate-700 text-white' },
       { name: 'C4', label: '도', color: 'bg-rose-100 text-rose-800', noteColor: 'bg-rose-600 text-white' }
     ];
@@ -484,24 +445,15 @@
       let baseList = noteNamesDiatonic;
       if (currentScale === 'pentatonic') baseList = noteNamesPentatonic;
       if (currentScale === 'chromatic') baseList = noteNamesChromatic;
-
       if (currentOctaves === 1) return baseList;
 
       let fullList = [];
-      let startOct, endOct;
-
-      if (currentOctaves === 2) {
-        startOct = 5;
-        endOct = 4;
-      } else {
-        startOct = 4 + Math.floor((currentOctaves - 1) / 2);
-        endOct = startOct - currentOctaves + 1;
-      }
+      let startOct = (currentOctaves === 2) ? 5 : 4 + Math.floor((currentOctaves - 1) / 2);
+      let endOct = startOct - currentOctaves + 1;
 
       for (let o = startOct; o >= endOct; o--) {
         baseList.forEach(n => {
-          const notePitchClass = n.name.slice(0, -1);
-          const pitch = notePitchClass + o;
+          const pitch = n.name.slice(0, -1) + o;
           fullList.push({
             name: pitch,
             label: o === 4 ? n.label : `${n.label}(${o})`,
@@ -520,158 +472,98 @@
       'B2': 123.47, 'A#2': 116.54, 'A2': 110.00, 'G2': 98.00, 'F#2': 92.50, 'F2': 87.31, 'E2': 82.41, 'D#2': 77.78, 'D2': 73.42, 'C#2': 69.30, 'C2': 65.41
     };
 
+    const midiPitchMap = {
+      'C6': 84, 'B5': 83, 'A#5': 82, 'A5': 81, 'G#5': 80, 'G5': 79, 'F#5': 78, 'F5': 77, 'E5': 76, 'D#5': 75, 'D5': 74, 'C#5': 73, 'C5': 72,
+      'B4': 71, 'A#4': 70, 'A4': 69, 'G#4': 68, 'G4': 67, 'F#4': 66, 'F4': 65, 'E4': 64, 'D#4': 63, 'D4': 62, 'C#4': 61, 'C4': 60,
+      'B3': 59, 'A#3': 58, 'A3': 57, 'G#3': 56, 'G3': 55, 'F#3': 54, 'F3': 53, 'E3': 52, 'D#3': 51, 'D3': 50, 'C#3': 49, 'C3': 48,
+      'B2': 47, 'A#2': 46, 'A2': 45, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D#2': 39, 'D2': 38, 'C#2': 37, 'C2': 36
+    };
+
     const percTracks = [
-      { 
-        id: 'high', 
-        label: '고음', 
-        selected: '하이햇 (Closed)', 
-        color: 'text-cyan-600',
-        shape: '△',
-        soundOpts: ['꽹과리', '소고', '트라이앵글', '하이햇 (Closed)', '하이햇 (Open)', '클랩 (손뼉)'] 
-      },
-      { 
-        id: 'mid', 
-        label: '중음', 
-        selected: '스네어 드럼', 
-        color: 'text-indigo-600',
-        shape: '□',
-        soundOpts: ['장구', '징', '우드블럭', '스네어 드럼', '탐탐', '림샷'] 
-      },
-      { 
-        id: 'low', 
-        label: '저음', 
-        selected: '킥 드럼 (베이스)', 
-        color: 'text-slate-700',
-        shape: '◯',
-        soundOpts: ['북', '용고/대고', '젬베', '킥 드럼 (베이스)', '로우 탐', '카혼 (베이스)'] 
-      }
+      { id: 'high', label: '고음', selected: '클로즈드 하이햇', color: 'text-cyan-600', svgIcon: '<svg class="w-6 h-6 sm:w-7 sm:h-7 stroke-current fill-none" viewBox="0 0 100 100"><polygon points="50,15 85,80 15,80" stroke-width="12" stroke-linejoin="round"/></svg>', soundOpts: ['오픈 하이햇', '클로즈드 하이햇', '트라이앵글', '꽹과리', '소고'] },
+      { id: 'mid', label: '중음', selected: '스네어 드럼', color: 'text-indigo-600', svgIcon: '<svg class="w-6 h-6 sm:w-7 sm:h-7 stroke-current fill-none" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="8" stroke-width="12" stroke-linejoin="round"/></svg>', soundOpts: ['스네어 드럼', '미들탐', '우드블럭', '징', '장구 채편'] },
+      { id: 'low', label: '저음', selected: '베이스 드럼', color: 'text-slate-700', svgIcon: '<svg class="w-6 h-6 sm:w-7 sm:h-7 stroke-current fill-none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" stroke-width="12"/></svg>', soundOpts: ['베이스 드럼', '로우탐', '베이스 카혼', '북', '장구 궁편'] }
     ];
 
     const sampleSongs = {
       airplane: {
-        name: '비행기',
-        bpm: 120,
-        inst: 'piano',
-        scale: 'diatonic',
-        octaves: 1,
-        timeSig: '4/4',
-        measures: 4,
+        name: '비행기', bpm: 120, inst: 'piano', scale: 'diatonic', octaves: 1, timeSig: '4/4', measures: 8,
         gridData: {
-          "E4": { "0": { "duration": 1 }, "4": { "duration": 1 }, "5": { "duration": 1 }, "6": { "duration": 2 }, "12": { "duration": 1 } },
-          "D4": { "1": { "duration": 1 }, "3": { "duration": 1 }, "8": { "duration": 1 }, "9": { "duration": 1 }, "10": { "duration": 2 } },
-          "C4": { "2": { "duration": 1 } },
-          "G4": { "13": { "duration": 1 }, "14": { "duration": 2 } },
-          "perc_mid": {
-            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "9": { "duration": 0.5 }, "11": { "duration": 0.5 }, "13": { "duration": 0.5 }, "15": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "7.0": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.0": { "duration": 0.5 }, "14.5": { "duration": 0.5 }, "15.0": { "duration": 0.5 }, "15.5": { "duration": 0.5 }
-          },
-          "perc_low": {
-            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "8.0": { "duration": 0.5 }, "12.0": { "duration": 0.5 }, "14.0": { "duration": 0.5 }
-          },
-          "perc_high": {
-            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "3": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "11": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "15": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "9.5": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.5": { "duration": 0.5 }, "15.5": { "duration": 0.5 }
-          }
+          "E4": { "0": {"duration": 1}, "4": {"duration": 1}, "5": {"duration": 1}, "6": {"duration": 2}, "12": {"duration": 1}, "16": {"duration": 1}, "20": {"duration": 1}, "21": {"duration": 1}, "22": {"duration": 2}, "26": {"duration": 1} },
+          "D4": { "1": {"duration": 1}, "3": {"duration": 1}, "8": {"duration": 1}, "9": {"duration": 1}, "10": {"duration": 2}, "17": {"duration": 1}, "19": {"duration": 1}, "24": {"duration": 1}, "25": {"duration": 1}, "27": {"duration": 1} },
+          "C4": { "2": {"duration": 1}, "18": {"duration": 1}, "28": {"duration": 3} },
+          "G4": { "13": {"duration": 1}, "14": {"duration": 2} },
+          "perc_high": { "0": {"duration":0.5}, "0.5": {"duration":0.5}, "1": {"duration":0.5}, "1.5": {"duration":0.5}, "2": {"duration":0.5}, "2.5": {"duration":0.5}, "3": {"duration":0.5}, "3.5": {"duration":0.5}, "4": {"duration":0.5}, "4.5": {"duration":0.5}, "5": {"duration":0.5}, "5.5": {"duration":0.5}, "6": {"duration":0.5}, "6.5": {"duration":0.5}, "7": {"duration":0.5}, "7.5": {"duration":0.5}, "8": {"duration":0.5}, "8.5": {"duration":0.5}, "9": {"duration":0.5}, "9.5": {"duration":0.5}, "10": {"duration":0.5}, "10.5": {"duration":0.5}, "11": {"duration":0.5}, "11.5": {"duration":0.5}, "12": {"duration":0.5}, "12.5": {"duration":0.5}, "13": {"duration":0.5}, "13.5": {"duration":0.5}, "14": {"duration":0.5}, "14.5": {"duration":0.5}, "15": {"duration":0.5}, "15.5": {"duration":0.5}, "16": {"duration":0.5}, "16.5": {"duration":0.5}, "17": {"duration":0.5}, "17.5": {"duration":0.5}, "18": {"duration":0.5}, "18.5": {"duration":0.5}, "19": {"duration":0.5}, "19.5": {"duration":0.5}, "20": {"duration":0.5}, "20.5": {"duration":0.5}, "21": {"duration":0.5}, "21.5": {"duration":0.5}, "22": {"duration":0.5}, "22.5": {"duration":0.5}, "23": {"duration":0.5}, "23.5": {"duration":0.5}, "24": {"duration":0.5}, "24.5": {"duration":0.5}, "25": {"duration":0.5}, "25.5": {"duration":0.5}, "26": {"duration":0.5}, "26.5": {"duration":0.5}, "27": {"duration":0.5}, "27.5": {"duration":0.5}, "28": {"duration":0.5}, "28.5": {"duration":0.5}, "29": {"duration":0.5}, "29.5": {"duration":0.5}, "30": {"duration":0.5}, "30.5": {"duration":0.5}, "31": {"duration":0.5}, "31.5": {"duration":0.5} },
+          "perc_mid": { "1": {"duration":0.5}, "3": {"duration":0.5}, "5": {"duration":0.5}, "7": {"duration":0.5}, "9": {"duration":0.5}, "11": {"duration":0.5}, "13": {"duration":0.5}, "15": {"duration":0.5}, "17": {"duration":0.5}, "19": {"duration":0.5}, "21": {"duration":0.5}, "23": {"duration":0.5}, "25": {"duration":0.5}, "27": {"duration":0.5}, "29": {"duration":0.5}, "31": {"duration":0.5} },
+          "perc_low": { "0": {"duration":0.5}, "2": {"duration":0.5}, "4": {"duration":0.5}, "6": {"duration":0.5}, "8": {"duration":0.5}, "10": {"duration":0.5}, "12": {"duration":0.5}, "14": {"duration":0.5}, "16": {"duration":0.5}, "18": {"duration":0.5}, "20": {"duration":0.5}, "22": {"duration":0.5}, "24": {"duration":0.5}, "26": {"duration":0.5}, "28": {"duration":0.5}, "30": {"duration":0.5} }
         }
       },
       butterfly: {
-        name: '나비야',
-        bpm: 110,
-        inst: 'piano',
-        scale: 'diatonic',
-        octaves: 1,
-        timeSig: '2/4',
-        measures: 4,
+        name: '나비야', bpm: 110, inst: 'piano', scale: 'diatonic', octaves: 1, timeSig: '2/4', measures: 8,
         gridData: {
-          "G4": { "0": { "duration": 1 } },
-          "E4": { "1": { "duration": 1 }, "2": { "duration": 2 } },
-          "F4": { "4": { "duration": 1 } },
-          "D4": { "5": { "duration": 1 }, "6": { "duration": 2 } },
-          "perc_high": {
-            "3": { "duration": 0.5 }, "7": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "0.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }
-          },
-          "perc_low": {
-            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "2.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "7.0": { "duration": 0.5 }
-          },
-          "perc_mid": {
-            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }
-          }
+          "G4": { "0": {"duration": 1}, "12": {"duration": 1}, "13": {"duration": 1}, "14": {"duration": 2} },
+          "E4": { "1": {"duration": 1}, "2": {"duration": 2}, "10": {"duration": 1} },
+          "F4": { "4": {"duration": 1}, "11": {"duration": 1} },
+          "D4": { "5": {"duration": 1}, "6": {"duration": 2}, "9": {"duration": 1} },
+          "C4": { "8": {"duration": 1} },
+          "perc_high": { "0.5": {"duration":0.5}, "1.5": {"duration":0.5}, "2.5": {"duration":0.5}, "3.5": {"duration":0.5}, "4.5": {"duration":0.5}, "5.5": {"duration":0.5}, "6.5": {"duration":0.5}, "7": {"duration":0.5}, "7.5": {"duration":0.5}, "8.5": {"duration":0.5}, "9.5": {"duration":0.5}, "10.5": {"duration":0.5}, "11.5": {"duration":0.5}, "12.5": {"duration":0.5}, "13.5": {"duration":0.5}, "14.5": {"duration":0.5}, "15": {"duration":0.5}, "15.5": {"duration":0.5} },
+          "perc_mid": { "1": {"duration":0.5}, "3": {"duration":0.5}, "5": {"duration":0.5}, "7": {"duration":0.5}, "9": {"duration":0.5}, "11": {"duration":0.5}, "13": {"duration":0.5}, "15": {"duration":0.5} },
+          "perc_low": { "0": {"duration":0.5}, "2": {"duration":0.5}, "4": {"duration":0.5}, "6": {"duration":0.5}, "8": {"duration":0.5}, "10": {"duration":0.5}, "12": {"duration":0.5}, "14": {"duration":0.5} }
         }
       },
       schoolbell: {
-        name: '학교종',
-        bpm: 120,
-        inst: 'piano',
-        scale: 'diatonic',
-        octaves: 1,
-        timeSig: '4/4',
-        measures: 4,
+        name: '학교종', bpm: 120, inst: 'piano', scale: 'diatonic', octaves: 1, timeSig: '4/4', measures: 4,
         gridData: {
-          "G4": { "0": { "duration": 1 }, "1": { "duration": 1 }, "4": { "duration": 1 }, "5": { "duration": 1 }, "8": { "duration": 1 }, "9": { "duration": 1 } },
-          "A4": { "2": { "duration": 1 }, "3": { "duration": 1 } },
-          "E4": { "6": { "duration": 2 }, "10": { "duration": 1 }, "11": { "duration": 1 } },
-          "D4": { "12": { "duration": 4 } },
-          "perc_mid": {
-            "1": { "duration": 0.5 }, "3": { "duration": 0.5 }, "5": { "duration": 0.5 }, "7": { "duration": 0.5 }, "9": { "duration": 0.5 }, "11": { "duration": 0.5 }, "13": { "duration": 0.5 }, "15": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "5.0": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "7.0": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "13.0": { "duration": 0.5 }, "15.0": { "duration": 0.5 }, "15.5": { "duration": 0.5 }, "14.5": { "duration": 0.5 }
-          },
-          "perc_low": {
-            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "6": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "14": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "8.0": { "duration": 0.5 }, "12.0": { "duration": 0.5 }, "14.0": { "duration": 0.5 }
-          },
-          "perc_high": {
-            "0": { "duration": 0.5 }, "2": { "duration": 0.5 }, "4": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "10": { "duration": 0.5 }, "12": { "duration": 0.5 }, "15": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "3.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "6.5": { "duration": 0.5 }, "9.5": { "duration": 0.5 }, "11.5": { "duration": 0.5 }, "14.5": { "duration": 0.5 }, "15.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "13.5": { "duration": 0.5 }
-          }
+          "G4": { "0": {"duration": 1}, "1": {"duration": 1}, "4": {"duration": 1}, "5": {"duration": 1}, "8": {"duration": 1}, "9": {"duration": 1} },
+          "A4": { "2": {"duration": 1}, "3": {"duration": 1} },
+          "E4": { "6": {"duration": 2}, "10": {"duration": 1}, "11": {"duration": 1} },
+          "D4": { "12": {"duration": 4} },
+          "perc_high": { "0": {"duration":0.5}, "0.5": {"duration":0.5}, "1": {"duration":0.5}, "1.5": {"duration":0.5}, "2": {"duration":0.5}, "2.5": {"duration":0.5}, "3": {"duration":0.5}, "3.5": {"duration":0.5}, "4": {"duration":0.5}, "4.5": {"duration":0.5}, "5": {"duration":0.5}, "5.5": {"duration":0.5}, "6": {"duration":0.5}, "6.5": {"duration":0.5}, "7": {"duration":0.5}, "7.5": {"duration":0.5}, "8": {"duration":0.5}, "8.5": {"duration":0.5}, "9": {"duration":0.5}, "9.5": {"duration":0.5}, "10": {"duration":0.5}, "10.5": {"duration":0.5}, "11": {"duration":0.5}, "11.5": {"duration":0.5}, "12": {"duration":0.5}, "12.5": {"duration":0.5}, "13": {"duration":0.5}, "13.5": {"duration":0.5}, "14": {"duration":0.5}, "14.5": {"duration":0.5}, "15": {"duration":0.5}, "15.5": {"duration":0.5} },
+          "perc_mid": { "0": {"duration":0.5}, "1": {"duration":0.5}, "3": {"duration":0.5}, "4": {"duration":0.5}, "5": {"duration":0.5}, "7": {"duration":0.5}, "8": {"duration":0.5}, "9": {"duration":0.5}, "11": {"duration":0.5}, "12": {"duration":0.5}, "13": {"duration":0.5}, "15": {"duration":0.5} },
+          "perc_low": { "0": {"duration":0.5}, "2": {"duration":0.5}, "4": {"duration":0.5}, "6": {"duration":0.5}, "8": {"duration":0.5}, "10": {"duration":0.5}, "12": {"duration":0.5}, "14": {"duration":0.5} }
         }
       },
       arirang: {
-        name: '아리랑',
-        bpm: 120,
-        inst: 'strings',
-        scale: 'pentatonic',
-        octaves: 2,
-        timeSig: '3/4',
-        measures: 4,
+        name: '아리랑', bpm: 120, inst: 'strings', scale: 'pentatonic', octaves: 2, timeSig: '3/4', measures: 4,
         gridData: {
-          "G4": { "0": { "duration": 1.5 }, "2": { "duration": 0.5 }, "9": { "duration": 3 } },
-          "A4": { "8.5": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 } },
-          "C5": { "3": { "duration": 1.5 }, "5": { "duration": 0.5 }, "8": { "duration": 0.5 } },
-          "D5": { "7": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "5.5": { "duration": 0.5 }, "7.75": { "duration": 0.25 } },
-          "E5": { "6": { "duration": 1 }, "7.5": { "duration": 0.25 } },
-          "perc_mid": {
-            "0": { "duration": 0.5 }, "1": { "duration": 0.5 }, "2": { "duration": 0.5 }, "3": { "duration": 0.5 }, "4": { "duration": 0.5 }, "5": { "duration": 0.5 }, "6": { "duration": 0.5 }, "7": { "duration": 0.5 }, "8": { "duration": 0.5 }, "9": { "duration": 0.5 }, "10": { "duration": 0.5 }, "11": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "9.0": { "duration": 0.5 }
-          },
-          "perc_low": {
-            "0": { "duration": 0.5 }, "3": { "duration": 0.5 }, "6": { "duration": 0.5 }, "9": { "duration": 0.5 }, "0.0": { "duration": 0.5 }, "2.0": { "duration": 0.5 }, "3.0": { "duration": 0.5 }, "4.0": { "duration": 0.5 }, "4.5": { "duration": 0.5 }, "6.0": { "duration": 0.5 }, "9.0": { "duration": 0.5 }, "10.0": { "duration": 0.5 }, "11.0": { "duration": 0.5 }, "1.5": { "duration": 0.5 }, "2.5": { "duration": 0.5 }, "7.5": { "duration": 0.5 }, "8.5": { "duration": 0.5 }, "10.5": { "duration": 0.5 }
-          }
+          "G4": { "0": {"duration": 1.5}, "2": {"duration": 0.5}, "9": {"duration": 3} },
+          "A4": { "1.5": {"duration": 0.5}, "2.5": {"duration": 0.5}, "8.5": {"duration": 0.5} },
+          "C5": { "3": {"duration": 1.5}, "5": {"duration": 0.5}, "8": {"duration": 0.5} },
+          "D5": { "4.5": {"duration": 0.5}, "5.5": {"duration": 0.5}, "7": {"duration": 0.5} },
+          "E5": { "6": {"duration": 1}, "7.5": {"duration": 0.5} },
+          "perc_mid": { "0": {"duration":0.5}, "1": {"duration":0.5}, "2": {"duration":0.5}, "4": {"duration":0.5}, "5": {"duration":0.5}, "6": {"duration":0.5}, "7": {"duration":0.5}, "8": {"duration":0.5}, "10": {"duration":0.5}, "11": {"duration":0.5} },
+          "perc_low": { "0": {"duration":0.5}, "3": {"duration":0.5}, "6": {"duration":0.5}, "9": {"duration":0.5} }
+        }
+      },
+      puff: {
+        name: '퍼프와 재키', bpm: 120, inst: 'piano', scale: 'diatonic', octaves: 2, timeSig: '4/4', measures: 8,
+        gridData: {
+          "B5": {}, "A5": {}, "G5": {}, "F5": {}, "E5": {},
+          "D5": { "28": {"duration": 4} },
+          "C5": { "0": {"duration": 1.5}, "1.5": {"duration": 0.5}, "2": {"duration": 1}, "3": {"duration": 1}, "10": {"duration": 1}, "11": {"duration": 1}, "22": {"duration": 1}, "23": {"duration": 0.5}, "23.5": {"duration": 0.5}, "24": {"duration": 1}, "27": {"duration": 1} },
+          "B4": { "4": {"duration": 2}, "26": {"duration": 1} },
+          "A4": { "8": {"duration": 1.5}, "9.5": {"duration": 0.5}, "10": {"duration": 1}, "25": {"duration": 1}, "27": {"duration": 1} },
+          "G4": { "0": {"duration": 1.5}, "1.5": {"duration": 0.5}, "2": {"duration": 1}, "3": {"duration": 1}, "6": {"duration": 2}, "12": {"duration": 3}, "15": {"duration": 1}, "18": {"duration": 1}, "20.5": {"duration": 1.5}, "22": {"duration": 1}, "23": {"duration": 0.5}, "28": {"duration": 4} },
+          "F4": { "8": {"duration": 2}, "11": {"duration": 1}, "16": {"duration": 1}, "17": {"duration": 1}, "19": {"duration": 1}, "23.5": {"duration": 0.5} },
+          "E4": { "4": {"duration": 2}, "6": {"duration": 2}, "12": {"duration": 3}, "15": {"duration": 1}, "20": {"duration": 0.5}, "20.5": {"duration": 1.5} },
+          "D4": { "18": {"duration": 1}, "19": {"duration": 1}, "24": {"duration": 1}, "25": {"duration": 1}, "26": {"duration": 1} },
+          "C4": { "16": {"duration": 2}, "20": {"duration": 0.5} },
+          "perc_high": {}, "perc_mid": {}, "perc_low": {}
         }
       }
     };
 
-    /* URL Hash 실시간 동기화 및 음악 공유 인코딩/디코딩 지원 함수 */
     function updateUrlHash() {
       try {
-        const stateObj = {
-          timeSig: currentTimeSig,
-          measures: currentMeasures,
-          bpm: bpm,
-          scale: currentScale,
-          octaves: currentOctaves,
-          inst: currentInstrument,
-          gridData: gridData
-        };
-        const jsonStr = JSON.stringify(stateObj);
-        const encodedData = encodeURIComponent(jsonStr);
-        
-        const currentPath = window.location.origin + window.location.pathname;
-        window.history.replaceState(null, '', currentPath + '#data=' + encodedData);
-      } catch (e) {
-        console.warn("URL Hash update failed:", e);
-      }
+        const stateObj = { timeSig: currentTimeSig, measures: currentMeasures, bpm: bpm, scale: currentScale, octaves: currentOctaves, inst: currentInstrument, gridData: gridData };
+        window.history.replaceState(null, '', window.location.origin + window.location.pathname + '#data=' + encodeURIComponent(JSON.stringify(stateObj)));
+      } catch (e) {}
     }
 
     function loadStateFromUrl() {
       if (!window.location.hash || !window.location.hash.startsWith('#data=')) return false;
       try {
-        const encodedData = window.location.hash.substring(6);
-        const jsonStr = decodeURIComponent(encodedData);
-        const loaded = JSON.parse(jsonStr);
+        const loaded = JSON.parse(decodeURIComponent(window.location.hash.substring(6)));
         if (loaded && loaded.gridData) {
           gridData = loaded.gridData;
           if (loaded.timeSig) currentTimeSig = loaded.timeSig;
@@ -681,27 +573,16 @@
           if (loaded.octaves) currentOctaves = loaded.octaves;
           if (loaded.inst) currentInstrument = loaded.inst;
 
-          const timeSigSelect = document.getElementById('timeSigSelect');
-          const measuresSelect = document.getElementById('measuresSelect');
-          const scaleSelect = document.getElementById('scaleSelect');
-          const octaveSelect = document.getElementById('octaveSelect');
-          const instSelect = document.getElementById('instSelect');
-          const bpmRange = document.getElementById('bpmRange');
-          const bpmVal = document.getElementById('bpmVal');
-
-          if (timeSigSelect) timeSigSelect.value = currentTimeSig;
-          if (measuresSelect) measuresSelect.value = currentMeasures;
-          if (scaleSelect) scaleSelect.value = currentScale;
-          if (octaveSelect) octaveSelect.value = currentOctaves;
-          if (instSelect) instSelect.value = currentInstrument;
-          if (bpmRange) bpmRange.value = bpm;
-          if (bpmVal) bpmVal.innerText = bpm;
-
+          document.getElementById('timeSigSelect').value = currentTimeSig;
+          document.getElementById('measuresSelect').value = currentMeasures;
+          document.getElementById('scaleSelect').value = currentScale;
+          document.getElementById('octaveSelect').value = currentOctaves;
+          document.getElementById('instSelect').value = currentInstrument;
+          document.getElementById('bpmRange').value = bpm;
+          document.getElementById('bpmVal').innerText = bpm;
           return true;
         }
-      } catch (e) {
-        console.warn("Failed to parse URL music data:", e);
-      }
+      } catch (e) {}
       return false;
     }
 
@@ -715,51 +596,29 @@
         const oscFund = ctx.createOscillator();   
         const oscTri = ctx.createOscillator();    
         const oscHammer = ctx.createOscillator(); 
-
         const gainFund = ctx.createGain();
         const gainTri = ctx.createGain();
         const gainHammer = ctx.createGain();
 
-        oscFund.type = 'sine';
-        oscFund.frequency.setValueAtTime(freq, now);
-
-        oscTri.type = 'triangle';
-        oscTri.frequency.setValueAtTime(freq * 2, now);
-
-        oscHammer.type = 'square';
-        oscHammer.frequency.setValueAtTime(freq * 4, now);
+        oscFund.type = 'sine'; oscFund.frequency.setValueAtTime(freq, now);
+        oscTri.type = 'triangle'; oscTri.frequency.setValueAtTime(freq * 2, now);
+        oscHammer.type = 'square'; oscHammer.frequency.setValueAtTime(freq * 4, now);
 
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(freq * 3.5, now);
         filter.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 1.5), now + duration * 1.5);
 
-        gainFund.gain.setValueAtTime(0.7, now);
-        gainFund.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.0));
+        gainFund.gain.setValueAtTime(0.7, now); gainFund.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.0));
+        gainTri.gain.setValueAtTime(0.25, now); gainTri.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.8, duration * 1.5));
+        gainHammer.gain.setValueAtTime(0.12, now); gainHammer.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
 
-        gainTri.gain.setValueAtTime(0.25, now);
-        gainTri.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.8, duration * 1.5));
-
-        gainHammer.gain.setValueAtTime(0.12, now);
-        gainHammer.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
-
-        oscFund.connect(gainFund);
-        oscTri.connect(gainTri);
-        oscHammer.connect(gainHammer);
-
-        gainFund.connect(filter);
-        gainTri.connect(filter);
-        gainHammer.connect(filter);
-
+        oscFund.connect(gainFund); oscTri.connect(gainTri); oscHammer.connect(gainHammer);
+        gainFund.connect(filter); gainTri.connect(filter); gainHammer.connect(filter);
         filter.connect(ctx.destination);
 
-        oscFund.start(now);
-        oscTri.start(now);
-        oscHammer.start(now);
-
-        oscFund.stop(now + Math.max(1.2, duration * 2.0));
-        oscTri.stop(now + Math.max(0.8, duration * 1.5));
-        oscHammer.stop(now + 0.04);
+        oscFund.start(now); oscTri.start(now); oscHammer.start(now);
+        oscFund.stop(now + Math.max(1.2, duration * 2.0)); oscTri.stop(now + Math.max(0.8, duration * 1.5)); oscHammer.stop(now + 0.04);
         return;
       } 
       
@@ -770,91 +629,54 @@
         const numOscs = 4;
         const detunes = [-7, -2.5, 3, 7.5]; 
         const masterGain = ctx.createGain();
-
         const lfo = ctx.createOscillator();
-        const lfoGain = ctx.createGain();
         lfo.frequency.setValueAtTime(5.5, now); 
-        lfoGain.gain.setValueAtTime(freq * 0.012, now); 
 
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(freq * 2.2, now);
-        filter.frequency.linearRampToValueAtTime(freq * 3.2, now + 0.25); 
-        filter.Q.setValueAtTime(1.2, now);
 
         for (let i = 0; i < numOscs; i++) {
           const oscEns = ctx.createOscillator();
           oscEns.type = (i % 2 === 0) ? 'sawtooth' : 'triangle'; 
           oscEns.frequency.setValueAtTime(freq, now);
           oscEns.detune.setValueAtTime(detunes[i], now);
-
           lfo.connect(oscEns.frequency);
           oscEns.connect(filter);
-          oscEns.start(now);
-          oscEns.stop(now + duration * 1.6);
+          oscEns.start(now); oscEns.stop(now + duration * 1.6);
         }
 
-        lfo.start(now);
-        lfo.stop(now + duration * 1.6);
-
+        lfo.start(now); lfo.stop(now + duration * 1.6);
         masterGain.gain.setValueAtTime(0.001, now);
         masterGain.gain.linearRampToValueAtTime(0.28, now + 0.12);
-        masterGain.gain.setValueAtTime(0.28, now + duration * 0.8);
         masterGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.6);
-
-        filter.connect(masterGain);
-        masterGain.connect(ctx.destination);
+        filter.connect(masterGain); masterGain.connect(ctx.destination);
         return;
       } else if (currentInstrument === 'woodwind') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.01, now);
-        gain.gain.linearRampToValueAtTime(0.5, now + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.01, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.08); gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
       } else if (currentInstrument === 'marimba') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.8, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.8, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
       } else if (currentInstrument === 'kalimba') {
-        const oscMain = ctx.createOscillator();
-        const oscHighBell = ctx.createOscillator();
-        const gainMain = ctx.createGain();
-        const gainHighBell = ctx.createGain();
-
-        oscMain.type = 'sine';
-        oscMain.frequency.setValueAtTime(freq, now);
-
-        oscHighBell.type = 'sine';
-        oscHighBell.frequency.setValueAtTime(freq * 4.0, now);
-
-        gainMain.gain.setValueAtTime(0.5, now);
-        gainMain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.2));
-
-        gainHighBell.gain.setValueAtTime(0.35, now);
-        gainHighBell.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-
-        oscMain.connect(gainMain);
-        oscHighBell.connect(gainHighBell);
-        gainMain.connect(ctx.destination);
-        gainHighBell.connect(ctx.destination);
-
-        oscMain.start(now);
-        oscHighBell.start(now);
-        oscMain.stop(now + Math.max(1.2, duration * 2.2));
-        oscHighBell.stop(now + 0.4);
+        const oscMain = ctx.createOscillator(); const oscHighBell = ctx.createOscillator();
+        const gainMain = ctx.createGain(); const gainHighBell = ctx.createGain();
+        oscMain.type = 'sine'; oscMain.frequency.setValueAtTime(freq, now);
+        oscHighBell.type = 'sine'; oscHighBell.frequency.setValueAtTime(freq * 4.0, now);
+        gainMain.gain.setValueAtTime(0.5, now); gainMain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(1.2, duration * 2.2));
+        gainHighBell.gain.setValueAtTime(0.35, now); gainHighBell.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+        oscMain.connect(gainMain); oscHighBell.connect(gainHighBell);
+        gainMain.connect(ctx.destination); gainHighBell.connect(ctx.destination);
+        oscMain.start(now); oscHighBell.start(now);
+        oscMain.stop(now + Math.max(1.2, duration * 2.2)); oscHighBell.stop(now + 0.4);
         return;
       } else {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.type = 'square'; osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
       }
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + duration * 1.5);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now); osc.stop(now + duration * 1.5);
     }
 
     function playPercussion(type, customCtx = null, startTime = 0) {
@@ -863,275 +685,190 @@
       const trackObj = percTracks.find(p => p.id === type);
       const instrument = trackObj ? trackObj.selected : '';
 
-      if (type === 'high') {
-        if (instrument === '꽹과리') {
-          const osc1 = ctx.createOscillator();
-          const osc2 = ctx.createOscillator();
-          const osc3 = ctx.createOscillator();
+      if (instrument === '클로즈드 하이햇' || instrument === '오픈 하이햇') {
+        const isClosed = (instrument === '클로즈드 하이햇');
+        const dur = isClosed ? 0.04 : 0.22;
+        const bufferSize = Math.floor(ctx.sampleRate * dur);
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
-          osc1.type = 'sawtooth';
-          osc2.type = 'square';
-          osc3.type = 'sine';
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(8000, now);
 
-          osc1.frequency.setValueAtTime(2450, now);
-          osc2.frequency.setValueAtTime(3820, now);
-          osc3.frequency.setValueAtTime(5120, now);
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.setValueAtTime(2200, now);
+        noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        noise.start(now);
+      } else if (instrument === '스네어 드럼') {
+        const toneOsc = ctx.createOscillator();
+        const toneGain = ctx.createGain();
+        toneOsc.type = 'triangle';
+        toneOsc.frequency.setValueAtTime(180, now);
+        toneOsc.frequency.exponentialRampToValueAtTime(80, now + 0.05);
 
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.85, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        toneGain.gain.setValueAtTime(0.7, now);
+        toneGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
-          osc1.connect(filter);
-          osc2.connect(filter);
-          osc3.connect(filter);
-          filter.connect(gain);
-          gain.connect(ctx.destination);
+        toneOsc.connect(toneGain);
+        toneGain.connect(ctx.destination);
+        toneOsc.start(now); toneOsc.stop(now + 0.05);
 
-          osc1.start(now); osc2.start(now); osc3.start(now);
-          osc1.stop(now + 0.35); osc2.stop(now + 0.35); osc3.stop(now + 0.35);
-        } else if (instrument === '소고') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(850, now);
-          osc.frequency.exponentialRampToValueAtTime(300, now + 0.08);
-          gain.gain.setValueAtTime(0.8, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.08);
-        } else if (instrument === '트라이앵글') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(4100, now);
-          gain.gain.setValueAtTime(0.6, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.6);
-        } else if (instrument === '하이햇 (Closed)') {
-          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
+        const dur = 0.06;
+        const bufferSize = Math.floor(ctx.sampleRate * dur);
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.setValueAtTime(7000, now);
+        const noiseSrc = ctx.createBufferSource();
+        noiseSrc.buffer = buffer;
 
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.6, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        const noiseFilter = ctx.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.setValueAtTime(1500, now);
 
-          noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-          noise.start(now); noise.stop(now + 0.05);
-        } else if (instrument === '하이햇 (Open)') {
-          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.65, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.setValueAtTime(6000, now);
+        noiseSrc.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+        noiseSrc.start(now);
+      } else if (instrument === '미들탐') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.12);
 
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.6, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        gain.gain.setValueAtTime(0.85, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
-          noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-          noise.start(now); noise.stop(now + 0.25);
-        } else {
-          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (instrument === '트라이앵글' || instrument === '꽹과리') {
+        const isGgwaeng = (instrument === '꽹과리');
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(1200, now);
-
-          const noiseGain = ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.8, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-          noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
-          noise.start(now); noise.stop(now + 0.12);
-        }
-
-      } else if (type === 'mid') {
-        if (instrument === '장구') {
-          const osc = ctx.createOscillator();
-          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
-
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(450, now);
-
-          const noiseGain = ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.6, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-          const toneGain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(160, now);
-          osc.frequency.exponentialRampToValueAtTime(80, now + 0.18);
-          toneGain.gain.setValueAtTime(0.8, now);
-          toneGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
-          noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
-          osc.connect(toneGain); toneGain.connect(ctx.destination);
-          noise.start(now); noise.stop(now + 0.15);
-          osc.start(now); osc.stop(now + 0.18);
-        } else if (instrument === '징') {
-          const osc1 = ctx.createOscillator();
-          const osc2 = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc1.type = 'sine';
-          osc2.type = 'triangle';
-          osc1.frequency.setValueAtTime(180, now);
-          osc2.frequency.setValueAtTime(184, now);
-
-          gain.gain.setValueAtTime(0.8, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-
-          osc1.connect(gain); osc2.connect(gain);
-          gain.connect(ctx.destination);
-
-          osc1.start(now); osc2.start(now);
-          osc1.stop(now + 1.2); osc2.stop(now + 1.2);
-        } else if (instrument === '우드블럭') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(750, now);
-          osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
-          gain.gain.setValueAtTime(0.9, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.05);
-        } else if (instrument === '스네어 드럼') {
-          const osc = ctx.createOscillator();
-          const oscGain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(180, now);
-          osc.frequency.exponentialRampToValueAtTime(80, now + 0.1);
-          oscGain.gain.setValueAtTime(0.7, now);
-          oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-
-          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
-
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.setValueAtTime(1000, now);
-
-          const noiseGain = ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.7, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
-          osc.connect(oscGain); oscGain.connect(ctx.destination);
-          noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.1);
-          noise.start(now); noise.stop(now + 0.2);
-        } else if (instrument === '탐탐') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(160, now);
-          osc.frequency.exponentialRampToValueAtTime(70, now + 0.25);
-          gain.gain.setValueAtTime(0.8, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.25);
-        } else {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(400, now);
-          osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
-          gain.gain.setValueAtTime(0.9, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.05);
-        }
-
-      } else if (type === 'low') {
-        if (instrument === '북') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(110, now);
-          osc.frequency.exponentialRampToValueAtTime(35, now + 0.22);
-          gain.gain.setValueAtTime(0.95, now);
+        osc1.type = 'sine'; osc2.type = 'triangle';
+        if (isGgwaeng) {
+          osc1.frequency.setValueAtTime(2800, now);
+          osc2.frequency.setValueAtTime(3900, now);
+          gain.gain.setValueAtTime(0.7, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.22);
-        } else if (instrument === '용고/대고') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(80, now);
-          osc.frequency.exponentialRampToValueAtTime(25, now + 0.4);
-          gain.gain.setValueAtTime(1.0, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.4);
-        } else if (instrument === '젬베') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(140, now);
-          osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
-          gain.gain.setValueAtTime(0.85, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.2);
-        } else if (instrument === '킥 드럼 (베이스)') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(130, now);
-          osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
-          gain.gain.setValueAtTime(1.0, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.3);
-        } else if (instrument === '로우 탐') {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(90, now);
-          osc.frequency.exponentialRampToValueAtTime(45, now + 0.35);
-          gain.gain.setValueAtTime(0.85, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.35);
         } else {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(80, now);
-          osc.frequency.exponentialRampToValueAtTime(25, now + 0.25);
-          gain.gain.setValueAtTime(0.9, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-          osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(now); osc.stop(now + 0.25);
+          osc1.frequency.setValueAtTime(4500, now);
+          osc2.frequency.setValueAtTime(5200, now);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
         }
+
+        osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
+        osc1.start(now); osc2.start(now);
+        osc1.stop(now + 0.4); osc2.stop(now + 0.4);
+      } else if (instrument === '소고' || instrument === '우드블럭') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime((instrument === '소고') ? 850 : 1200, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.04);
+        gain.gain.setValueAtTime(0.8, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.04);
+      } else if (instrument === '장구 채편') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.06);
+        gain.gain.setValueAtTime(0.75, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.06);
+      } else if (instrument === '징') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(210, now);
+        osc.frequency.linearRampToValueAtTime(170, now + 1.0);
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 1.1);
+      } else if (instrument === '베이스 드럼') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.05);
+
+        gain.gain.setValueAtTime(1.0, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.05);
+      } else if (instrument === '로우탐') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(55, now + 0.15);
+
+        gain.gain.setValueAtTime(0.85, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.15);
+      } else if (instrument === '베이스 카혼') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+
+        gain.gain.setValueAtTime(0.9, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.08);
+      } else if (instrument === '북') {
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(65, now + 0.18);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, now);
+
+        gain.gain.setValueAtTime(0.9, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+        osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.18);
+      } else if (instrument === '장구 궁편') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.14);
+
+        gain.gain.setValueAtTime(0.8, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.14);
       }
     }
 
@@ -1139,8 +876,7 @@
       const scrollArea = document.getElementById('gridScrollArea');
       const spacer = document.getElementById('headerScrollSpacer');
       if (scrollArea && spacer) {
-        const scrollbarWidth = scrollArea.offsetWidth - scrollArea.clientWidth;
-        spacer.style.width = `${scrollbarWidth}px`;
+        spacer.style.width = `${scrollArea.offsetWidth - scrollArea.clientWidth}px`;
       }
     }
 
@@ -1148,12 +884,9 @@
       const stepsHeader = document.getElementById('stepsHeader');
       const scoreGrid = document.getElementById('scoreGrid');
       const percGrid = document.getElementById('percGrid');
-
       if (!stepsHeader || !scoreGrid || !percGrid) return;
 
-      stepsHeader.innerHTML = '';
-      scoreGrid.innerHTML = '';
-      percGrid.innerHTML = '';
+      stepsHeader.innerHTML = ''; scoreGrid.innerHTML = ''; percGrid.innerHTML = '';
 
       const totalQuarterBeats = getTotalSteps();
       const beatsPerMeasure = getBeatsPerMeasure();
@@ -1161,13 +894,8 @@
       for (let s = 0; s < totalQuarterBeats; s++) {
         const stepBox = document.createElement('div');
         const isMeasureStart = s % beatsPerMeasure === 0;
-
-        let borderClass = 'border-r border-slate-200';
-        if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
-
-        stepBox.className = `flex-1 h-9 sm:h-10 flex items-center justify-center text-xs font-bold ${borderClass} ${
-          isMeasureStart ? 'bg-slate-200 text-slate-800 font-black' : 'bg-slate-100 text-slate-500'
-        }`;
+        let borderClass = isMeasureStart ? 'border-l-2 border-l-slate-300 border-r border-slate-200' : 'border-r border-slate-200';
+        stepBox.className = `flex-1 h-9 sm:h-10 flex items-center justify-center text-xs font-bold ${borderClass} ${isMeasureStart ? 'bg-slate-200 text-slate-800 font-black' : 'bg-slate-100 text-slate-500'}`;
         stepBox.innerText = isMeasureStart ? `${Math.floor(s / beatsPerMeasure) + 1}마디` : '';
         stepBox.id = `step-head-${s}`;
         stepsHeader.appendChild(stepBox);
@@ -1187,144 +915,82 @@
 
         const cellsContainer = document.createElement('div');
         cellsContainer.className = 'flex flex-1 w-full relative';
-
         const rowKey = n.name;
         if (!gridData[rowKey]) gridData[rowKey] = {};
 
         for (let s = 0; s < totalQuarterBeats; s++) {
           const isMeasureStart = s % beatsPerMeasure === 0;
-
-          let borderClass = 'border-r border-slate-200';
-          if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-slate-200';
+          let borderClass = isMeasureStart ? 'border-l-2 border-l-slate-300 border-r border-slate-200' : 'border-r border-slate-200';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 ${rowHeightClass} border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${
-            isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'
-          }`;
+          cell.className = `grid-cell flex-1 ${rowHeightClass} border-b border-slate-200/80 relative cursor-pointer ${borderClass} ${isMeasureStart ? 'bg-slate-100/70 hover:bg-slate-200/50' : 'bg-white hover:bg-slate-50'}`;
           cell.id = `cell-${rowKey}-${s}`;
 
           Object.keys(gridData[rowKey]).forEach((subKey) => {
             const subStep = parseFloat(subKey);
             if (subStep >= s && subStep < s + 1) {
               const noteData = gridData[rowKey][subKey];
-              const offsetInCell = subStep - s;
               const noteBlock = document.createElement('div');
-              
-              const leftPct = offsetInCell * 100;
-              const widthPct = (noteData.duration || 1) * 100;
-
               noteBlock.className = `snap-note absolute top-0 h-full ${n.noteColor} shadow-sm rounded-md border border-white/60 flex items-center justify-end z-10 select-none overflow-hidden`;
-              noteBlock.style.left = `${leftPct}%`;
-              noteBlock.style.width = `${widthPct}%`;
-              noteBlock.id = `block-${rowKey}-${subStep}`;
+              noteBlock.style.left = `${(subStep - s) * 100}%`;
+              noteBlock.style.width = `${(noteData.duration || 1) * 100}%`;
 
               const handle = document.createElement('div');
               handle.className = 'w-4 h-full cursor-ew-resize hover:bg-black/10 active:bg-black/20 flex items-center justify-center shrink-0 text-[10px] font-bold opacity-70 z-20';
               handle.innerText = '⋮';
               
               const startResize = (clientX) => {
-                const totalBeats = getTotalSteps();
-                let nextKeyStep = totalBeats;
-
+                saveStateForUndo();
+                let nextKeyStep = getTotalSteps();
                 Object.keys(gridData[rowKey]).forEach(k => {
                   const kStep = parseFloat(k);
-                  if (kStep > subStep && kStep < nextKeyStep) {
-                    nextKeyStep = kStep;
-                  }
+                  if (kStep > subStep && kStep < nextKeyStep) nextKeyStep = kStep;
                 });
-
-                const maxDur = nextKeyStep - subStep;
-
                 activeResizeState = {
-                  rowKey: rowKey,
-                  startStep: subStep,
-                  startDur: noteData.duration || 1,
-                  startClientX: clientX,
-                  cellWidthPx: cell.getBoundingClientRect().width,
-                  totalSteps: totalBeats,
-                  maxDuration: maxDur,
-                  targetElem: noteBlock
+                  rowKey: rowKey, startStep: subStep, startDur: noteData.duration || 1, startClientX: clientX,
+                  cellWidthPx: cell.getBoundingClientRect().width, maxDuration: nextKeyStep - subStep, targetElem: noteBlock
                 };
               };
 
-              handle.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                startResize(e.clientX);
-              });
-
-              handle.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                if (e.touches.length > 0) {
-                  startResize(e.touches[0].clientX);
-                }
-              }, { passive: false });
-
+              handle.addEventListener('mousedown', (e) => { e.stopPropagation(); e.preventDefault(); startResize(e.clientX); });
+              handle.addEventListener('touchstart', (e) => { e.stopPropagation(); if (e.touches.length > 0) startResize(e.touches[0].clientX); }, { passive: false });
               noteBlock.appendChild(handle);
               cell.appendChild(noteBlock);
             }
           });
 
-          const handleCellClick = (e) => {
+          cell.addEventListener('click', (e) => {
             if (activeResizeState) return;
             getAudioContext();
             const rect = cell.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const fraction = Math.max(0, Math.min(0.99, clickX / rect.width));
-            
-            let subOffset = 0;
-            if (selectedDuration === 0.25) {
-              subOffset = Math.round(fraction * 4) * 0.25;
-            } else if (selectedDuration === 0.5) {
-              subOffset = Math.round(fraction * 2) * 0.5;
-            } else {
-              subOffset = 0; 
-            }
-
+            const fraction = Math.max(0, Math.min(0.99, (e.clientX - rect.left) / rect.width));
+            let subOffset = (selectedDuration === 0.25) ? Math.round(fraction * 4) * 0.25 : ((selectedDuration === 0.5) ? Math.round(fraction * 2) * 0.5 : 0);
             const targetStep = s + Math.min(0.75, subOffset);
 
             let existingKeyToToggle = null;
             Object.keys(gridData[rowKey]).forEach((existKey) => {
               const existStep = parseFloat(existKey);
               const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
-              if (targetStep >= existStep && targetStep < existStep + existDur - 0.001) {
-                existingKeyToToggle = existKey;
-              }
+              if (targetStep >= existStep && targetStep < existStep + existDur - 0.001) existingKeyToToggle = existKey;
             });
 
+            saveStateForUndo();
             if (existingKeyToToggle !== null) {
               delete gridData[rowKey][existingKeyToToggle];
             } else {
-              const newStart = targetStep;
-              const newEnd = targetStep + selectedDuration;
-
-              Object.keys(gridData[rowKey]).forEach((existKey) => {
-                const existStep = parseFloat(existKey);
-                const existDur = (gridData[rowKey][existKey] && gridData[rowKey][existKey].duration) ? gridData[rowKey][existKey].duration : 1;
-                const existEnd = existStep + existDur;
-
-                if (Math.max(newStart, existStep) < Math.min(newEnd, existEnd) - 0.001) {
-                  delete gridData[rowKey][existKey];
-                }
-              });
-
               gridData[rowKey][targetStep] = { duration: selectedDuration };
               playNote(rowKey, selectedDuration * (60 / bpm));
             }
             renderGrid();
-          };
-
-          cell.addEventListener('click', handleCellClick);
+          });
 
           cellsContainer.appendChild(cell);
         }
-
         row.appendChild(cellsContainer);
         scoreGrid.appendChild(row);
       });
 
       const totalSubBeats8th = totalQuarterBeats * 2;
-
       percTracks.forEach((pTrack) => {
         const row = document.createElement('div');
         row.className = 'flex items-center w-full';
@@ -1340,8 +1006,7 @@
         select.className = 'bg-white border border-amber-300 rounded text-[9px] sm:text-[11px] font-bold text-slate-700 px-0.5 py-0.5 w-full cursor-pointer focus:outline-none';
         pTrack.soundOpts.forEach(opt => {
           const option = document.createElement('option');
-          option.value = opt;
-          option.innerText = opt;
+          option.value = opt; option.innerText = opt;
           if (opt === pTrack.selected) option.selected = true;
           select.appendChild(option);
         });
@@ -1357,41 +1022,28 @@
 
         const cellsContainer = document.createElement('div');
         cellsContainer.className = 'flex flex-1 w-full relative';
-
         const rowKey = `perc_${pTrack.id}`;
         if (!gridData[rowKey]) gridData[rowKey] = {};
 
         const subBeatsPerMeasure8th = beatsPerMeasure * 2;
-
         for (let subIdx = 0; subIdx < totalSubBeats8th; subIdx++) {
           const isMeasureStart = subIdx % subBeatsPerMeasure8th === 0;
-          const posInMeasure = subIdx % 8; 
-          const isOddColInMeasure = (posInMeasure % 2 === 0); 
           const targetStep = subIdx * 0.5;
-
-          let borderClass = 'border-r border-amber-200/80';
-          if (isMeasureStart) borderClass = 'border-l-2 border-l-slate-300 border-r border-amber-200';
+          let borderClass = isMeasureStart ? 'border-l-2 border-l-slate-300 border-r border-amber-200' : 'border-r border-amber-200/80';
 
           const cell = document.createElement('div');
-          cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 relative cursor-pointer ${borderClass} ${
-            isOddColInMeasure ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'
-          }`;
+          cell.className = `grid-cell flex-1 h-11 sm:h-14 border-t border-b border-amber-200/60 relative cursor-pointer ${borderClass} ${(subIdx % 8 % 2 === 0) ? 'bg-amber-100/60 hover:bg-amber-200/60' : 'bg-amber-50/30 hover:bg-amber-100/40'}`;
 
           if (gridData[rowKey][targetStep]) {
             const percBlock = document.createElement('div');
-            
-            let fontSizeClass = 'text-2xl sm:text-3xl';
-            if (pTrack.id === 'low') {
-              fontSizeClass = 'text-[13px] sm:text-[15px]';
-            }
-
-            percBlock.className = `snap-note absolute inset-0 w-full h-full flex items-center justify-center z-10 font-black ${fontSizeClass} leading-none select-none ${pTrack.color}`;
-            percBlock.innerText = pTrack.shape;
+            percBlock.className = `snap-note absolute inset-0 w-full h-full flex items-center justify-center z-10 font-black leading-none select-none ${pTrack.color}`;
+            percBlock.innerHTML = pTrack.svgIcon;
             cell.appendChild(percBlock);
           }
 
-          const handleCellClick = () => {
+          cell.addEventListener('click', () => {
             getAudioContext();
+            saveStateForUndo();
             if (gridData[rowKey][targetStep]) {
               delete gridData[rowKey][targetStep];
             } else {
@@ -1399,9 +1051,7 @@
               playPercussion(pTrack.id);
             }
             renderGrid();
-          };
-
-          cell.addEventListener('click', handleCellClick);
+          });
 
           cellsContainer.appendChild(cell);
         }
@@ -1413,67 +1063,60 @@
       setTimeout(updateScrollSpacer, 0);
     }
 
-    /* VexFlow 기반 오선보 악보 변환 및 렌더링 함수 */
+    /* 오선보 렌더링 (화음/2중주 표기 지원 - 한 줄에 4마디 배치) */
     function renderSheetMusic() {
       const container = document.getElementById('sheetContainer');
       if (!container) return;
       container.innerHTML = '';
-
-      if (typeof Vex === 'undefined') {
-        container.innerHTML = '<p class="text-rose-500 font-bold py-8">Library Error</p>';
-        return;
-      }
+      if (typeof Vex === 'undefined') { container.innerHTML = '<p class="text-rose-500 font-bold py-8">Library Error</p>'; return; }
 
       const VF = Vex.Flow;
       const beatsPerMeasure = getBeatsPerMeasure();
       const totalMeasures = currentMeasures;
 
-      let measureNotes = [];
-      for (let m = 0; m < totalMeasures; m++) {
-        measureNotes.push([]);
-      }
-
-      let melodyEvents = [];
-      Object.keys(gridData).forEach(rowKey => {
-        if (rowKey.startsWith('perc_')) return;
-        Object.keys(gridData[rowKey]).forEach(stepStr => {
-          const startStep = parseFloat(stepStr);
-          const noteObj = gridData[rowKey][stepStr];
-          melodyEvents.push({
-            pitch: rowKey,
-            startStep: startStep,
-            duration: noteObj.duration || 1
-          });
-        });
-      });
-
-      melodyEvents.sort((a, b) => a.startStep - b.startStep);
+      let measureNotes = Array.from({ length: totalMeasures }, () => []);
 
       for (let m = 0; m < totalMeasures; m++) {
         const mStart = m * beatsPerMeasure;
         const mEnd = mStart + beatsPerMeasure;
+
+        let timeMap = {};
+        Object.keys(gridData).forEach(rowKey => {
+          if (rowKey.startsWith('perc_')) return;
+          Object.keys(gridData[rowKey]).forEach(stepStr => {
+            const step = parseFloat(stepStr);
+            if (step >= mStart && step < mEnd) {
+              if (!timeMap[step]) timeMap[step] = [];
+              timeMap[step].push({
+                pitch: rowKey,
+                duration: gridData[rowKey][stepStr].duration || 1
+              });
+            }
+          });
+        });
+
+        const sortedSteps = Object.keys(timeMap).map(Number).sort((a, b) => a - b);
         let currentPos = mStart;
 
-        const mEvents = melodyEvents.filter(e => e.startStep >= mStart && e.startStep < mEnd);
-
-        mEvents.forEach(evt => {
-          if (evt.startStep > currentPos) {
-            const restDur = evt.startStep - currentPos;
-            addVexRest(measureNotes[m], restDur, VF);
-            currentPos = evt.startStep;
+        sortedSteps.forEach(step => {
+          if (step > currentPos) {
+            addVexRest(measureNotes[m], step - currentPos, VF);
+            currentPos = step;
           }
 
-          addVexNote(measureNotes[m], evt.pitch, evt.duration, VF);
-          currentPos = evt.startStep + evt.duration;
+          const chordNotes = timeMap[step];
+          const dur = chordNotes[0].duration;
+
+          addVexChord(measureNotes[m], chordNotes, dur, VF);
+          currentPos = step + dur;
         });
 
         if (currentPos < mEnd) {
-          const restDur = mEnd - currentPos;
-          addVexRest(measureNotes[m], restDur, VF);
+          addVexRest(measureNotes[m], mEnd - currentPos, VF);
         }
       }
 
-      const measuresPerLine = 2;
+      const measuresPerLine = 4;
       const numLines = Math.ceil(totalMeasures / measuresPerLine);
 
       for (let line = 0; line < numLines; line++) {
@@ -1482,7 +1125,7 @@
         container.appendChild(lineDiv);
 
         const renderer = new VF.Renderer(lineDiv, VF.Renderer.Backends.SVG);
-        renderer.resize(750, 130);
+        renderer.resize(780, 130);
         const context = renderer.getContext();
 
         for (let i = 0; i < measuresPerLine; i++) {
@@ -1490,55 +1133,41 @@
           if (mIdx >= totalMeasures) break;
 
           const isFirstInLine = (i === 0);
-          const isFirstMeasureOfSong = (mIdx === 0);
-          const isLastMeasureOfSong = (mIdx === totalMeasures - 1);
-
-          const width = isFirstInLine ? 380 : 350;
-          const x = isFirstInLine ? 10 : 380;
-
-          const stave = new VF.Stave(x, 10, width);
+          const stave = new VF.Stave(isFirstInLine ? 10 : 10 + i * 190, 10, isFirstInLine ? 200 : 190);
 
           if (isFirstInLine) {
             stave.addClef('treble');
-            if (isFirstMeasureOfSong) {
-              stave.addTimeSignature(currentTimeSig);
-            }
-          } else {
-            stave.setBegBarType(VF.Barline.type.NONE);
-          }
+            if (mIdx === 0) stave.addTimeSignature(currentTimeSig);
+          } else { stave.setBegBarType(VF.Barline.type.NONE); }
 
-          if (isLastMeasureOfSong) {
-            stave.setEndBarType(VF.Barline.type.END);
-          }
-
+          if (mIdx === totalMeasures - 1) stave.setEndBarType(VF.Barline.type.END);
           stave.setContext(context).draw();
 
           const notes = measureNotes[mIdx];
           if (notes.length > 0) {
             try {
-              const voice = new VF.Voice({ num_beats: beatsPerMeasure, beat_value: 4 });
-              voice.setMode(VF.Voice.Mode.SOFT);
+              const voice = new VF.Voice({ num_beats: beatsPerMeasure, beat_value: 4 }).setMode(VF.Voice.Mode.SOFT);
               voice.addTickables(notes);
-
-              new VF.Formatter().joinVoices([voice]).format([voice], width - (isFirstInLine ? (isFirstMeasureOfSong ? 90 : 60) : 30));
+              new VF.Formatter().joinVoices([voice]).format([voice], isFirstInLine ? 120 : 160);
               voice.draw(context, stave);
-            } catch (err) {
-              console.warn("VexFlow Formatter Warning:", err);
-            }
+            } catch (err) {}
           }
         }
       }
     }
 
-    function addVexNote(arr, pitchStr, durBeats, VF) {
-      let key = pitchStr.toLowerCase().replace('#', 'b');
-      let octave = parseInt(pitchStr.slice(-1));
-      let noteName = pitchStr.slice(0, -1).toLowerCase();
-      let vexKey = `${noteName}/${octave}`;
+    function addVexChord(arr, chordNotes, durBeats, VF) {
+      let keys = [];
+      let accidentals = [];
 
-      let vexDur = 'q';
-      let isDotted = false;
+      chordNotes.forEach(n => {
+        let octave = parseInt(n.pitch.slice(-1));
+        let noteName = n.pitch.slice(0, -1).toLowerCase();
+        keys.push(`${noteName}/${octave}`);
+        if (n.pitch.includes('#')) accidentals.push(keys.length - 1);
+      });
 
+      let vexDur = 'q'; let isDotted = false;
       if (durBeats === 0.25) vexDur = '16';
       else if (durBeats === 0.5) vexDur = '8';
       else if (durBeats === 1) vexDur = 'q';
@@ -1547,71 +1176,42 @@
       else if (durBeats === 3) { vexDur = 'h'; isDotted = true; }
       else if (durBeats === 4) vexDur = 'w';
 
-      const pitchValueOrder = { 'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5, 'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11 };
-      const absPitchValue = octave * 12 + (pitchValueOrder[noteName] || 0);
-      const b4PitchValue = 4 * 12 + 11;
+      const noteConfig = { clef: 'treble', keys: keys, duration: vexDur };
+      const note = new VF.StaveNote(noteConfig);
 
-      let stemDir = VF.StaveNote.STEM_UP;
-      if (absPitchValue >= b4PitchValue) {
-        stemDir = VF.StaveNote.STEM_DOWN;
-      }
+      accidentals.forEach(idx => note.addModifier(new VF.Accidental('#'), idx));
+      if (isDotted) note.addModifier(new VF.Dot());
 
-      const note = new VF.StaveNote({ 
-        clef: 'treble', 
-        keys: [vexKey], 
-        duration: vexDur,
-        stem_direction: stemDir 
-      });
-
-      if (pitchStr.includes('#')) {
-        note.addModifier(new VF.Accidental('#'));
-      }
-      if (isDotted) {
-        note.addModifier(new VF.Dot());
-      }
       arr.push(note);
     }
 
     function addVexRest(arr, durBeats, VF) {
       let remaining = durBeats;
       while (remaining > 0) {
-        let vexDur = 'q';
-        let stepDur = 1;
-
+        let vexDur = 'q'; let stepDur = 1;
         if (remaining >= 4) { vexDur = 'w'; stepDur = 4; }
         else if (remaining >= 2) { vexDur = 'h'; stepDur = 2; }
         else if (remaining >= 1) { vexDur = 'q'; stepDur = 1; }
         else if (remaining >= 0.5) { vexDur = '8'; stepDur = 0.5; }
         else { vexDur = '16'; stepDur = 0.25; }
 
-        const rest = new VF.StaveNote({ clef: 'treble', keys: ['b/4'], duration: vexDur + 'r' });
-        arr.push(rest);
+        arr.push(new VF.StaveNote({ clef: 'treble', keys: ['b/4'], duration: vexDur + 'r' }));
         remaining -= stepDur;
       }
     }
 
     function handleGlobalMove(clientX) {
       if (!activeResizeState) return;
-
-      const deltaX = clientX - activeResizeState.startClientX;
-      const deltaBeats = deltaX / activeResizeState.cellWidthPx;
-
-      let newDuration = activeResizeState.startDur + Math.round(deltaBeats * 4) * 0.25;
-      newDuration = Math.max(0.25, Math.min(activeResizeState.maxDuration, newDuration));
-
+      const deltaBeats = (clientX - activeResizeState.startClientX) / activeResizeState.cellWidthPx;
+      let newDuration = Math.max(0.25, Math.min(activeResizeState.maxDuration, activeResizeState.startDur + Math.round(deltaBeats * 4) * 0.25));
       activeResizeState.currentDuration = newDuration;
-
-      if (activeResizeState.targetElem) {
-        activeResizeState.targetElem.style.width = `${newDuration * 100}%`;
-      }
+      if (activeResizeState.targetElem) activeResizeState.targetElem.style.width = `${newDuration * 100}%`;
     }
 
     function handleGlobalEnd() {
       if (activeResizeState) {
         const { rowKey, startStep, currentDuration } = activeResizeState;
-        if (currentDuration && gridData[rowKey] && gridData[rowKey][startStep]) {
-          gridData[rowKey][startStep].duration = currentDuration;
-        }
+        if (currentDuration && gridData[rowKey] && gridData[rowKey][startStep]) gridData[rowKey][startStep].duration = currentDuration;
         activeResizeState = null;
         renderGrid();
       }
@@ -1619,89 +1219,52 @@
 
     window.addEventListener('mousemove', (e) => handleGlobalMove(e.clientX));
     window.addEventListener('mouseup', handleGlobalEnd);
-
-    window.addEventListener('touchmove', (e) => {
-      if (activeResizeState && e.touches.length > 0) {
-        handleGlobalMove(e.touches[0].clientX);
-      }
-    }, { passive: true });
+    window.addEventListener('touchmove', (e) => { if (activeResizeState && e.touches.length > 0) handleGlobalMove(e.touches[0].clientX); }, { passive: true });
     window.addEventListener('touchend', handleGlobalEnd);
 
     function startPlayback() {
       if (isPlaying) return;
       getAudioContext();
-      isPlaying = true;
-      currentStep = 0;
-
+      isPlaying = true; currentStep = 0;
       const playBtn = document.getElementById('playBtn');
-      if (playBtn) {
-        playBtn.classList.replace('bg-emerald-600', 'bg-amber-600');
-        playBtn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i>';
-      }
-
+      if (playBtn) { playBtn.classList.replace('bg-emerald-600', 'bg-amber-600'); playBtn.innerHTML = '<i class="fa-solid fa-pause text-xs"></i>'; }
       playbackLoop();
     }
 
     function playbackLoop() {
       if (!isPlaying) return;
-
       const totalSteps16th = getTotalSteps() * 4;
 
       if (currentStep >= totalSteps16th) {
-        if (isLooping) {
-          currentStep = 0;
-        } else {
-          stopPlayback();
-          return;
-        }
+        if (isLooping) { currentStep = 0; } else { stopPlayback(); return; }
       }
 
       playStep16th(currentStep);
-
-      const quarterBeatDuration = 60 / bpm;
-      const step16thDurationMs = (quarterBeatDuration / 4) * 1000;
-      
       currentStep++;
-
-      playTimeout = setTimeout(playbackLoop, step16thDurationMs);
+      playTimeout = setTimeout(playbackLoop, ((60 / bpm) / 4) * 1000);
     }
 
     function stopPlayback() {
       isPlaying = false;
       if (playTimeout) clearTimeout(playTimeout);
-
       const playBtn = document.getElementById('playBtn');
-      if (playBtn) {
-        playBtn.classList.replace('bg-amber-600', 'bg-emerald-600');
-        playBtn.innerHTML = '<i class="fa-solid fa-play text-xs"></i>';
-      }
-
-      document.querySelectorAll('[id^="step-head-"]').forEach(el => {
-        el.classList.remove('bg-amber-400', 'text-amber-950');
-      });
+      if (playBtn) { playBtn.classList.replace('bg-amber-600', 'bg-emerald-600'); playBtn.innerHTML = '<i class="fa-solid fa-play text-xs"></i>'; }
+      document.querySelectorAll('[id^="step-head-"]').forEach(el => el.classList.remove('bg-amber-400', 'text-amber-950'));
     }
 
     function playStep16th(step16th) {
       const beatIndex = Math.floor(step16th / 4);
-      const subOffset = (step16th % 4) * 0.25;
-      const currentSubStep = beatIndex + subOffset;
+      const currentSubStep = beatIndex + (step16th % 4) * 0.25;
 
       document.querySelectorAll('[id^="step-head-"]').forEach((el, idx) => {
-        if (idx === beatIndex) {
-          el.classList.add('bg-amber-400', 'text-amber-950');
-        } else {
-          el.classList.remove('bg-amber-400', 'text-amber-950');
-        }
+        if (idx === beatIndex) el.classList.add('bg-amber-400', 'text-amber-950');
+        else el.classList.remove('bg-amber-400', 'text-amber-950');
       });
 
-      const activeNotes = getActiveNoteList();
-
-      activeNotes.forEach((n) => {
+      getActiveNoteList().forEach((n) => {
         const rowKey = n.name;
         if (gridData[rowKey] && gridData[rowKey][currentSubStep]) {
-          const noteData = gridData[rowKey][currentSubStep];
-          const beatDuration = (noteData.duration || 1) * (60 / bpm);
-          playNote(rowKey, beatDuration);
+          playNote(rowKey, (gridData[rowKey][currentSubStep].duration || 1) * (60 / bpm));
         }
       });
 
@@ -1709,9 +1272,7 @@
         const rowKey = `perc_${pTrack.id}`;
         if (gridData[rowKey]) {
           Object.keys(gridData[rowKey]).forEach((key) => {
-            if (Math.abs(parseFloat(key) - currentSubStep) < 0.01 && gridData[rowKey][key]) {
-              playPercussion(pTrack.id);
-            }
+            if (Math.abs(parseFloat(key) - currentSubStep) < 0.01 && gridData[rowKey][key]) playPercussion(pTrack.id);
           });
         }
       });
@@ -1720,391 +1281,219 @@
     function loadSampleSong(key) {
       const song = sampleSongs[key];
       if (!song) return;
-
+      saveStateForUndo();
       gridData = JSON.parse(JSON.stringify(song.gridData || {}));
-      currentTimeSig = song.timeSig;
-      currentMeasures = song.measures;
-      bpm = song.bpm;
+      currentTimeSig = song.timeSig; currentMeasures = song.measures; bpm = song.bpm;
       if (song.scale) currentScale = song.scale;
       if (song.octaves) currentOctaves = song.octaves;
       if (song.inst) currentInstrument = song.inst;
 
-      const timeSigSelect = document.getElementById('timeSigSelect');
-      const measuresSelect = document.getElementById('measuresSelect');
-      const scaleSelect = document.getElementById('scaleSelect');
-      const octaveSelect = document.getElementById('octaveSelect');
-      const instSelect = document.getElementById('instSelect');
-      const bpmRange = document.getElementById('bpmRange');
-      const bpmVal = document.getElementById('bpmVal');
-
-      if (timeSigSelect) timeSigSelect.value = currentTimeSig;
-      if (measuresSelect) measuresSelect.value = currentMeasures;
-      if (scaleSelect) scaleSelect.value = currentScale;
-      if (octaveSelect) octaveSelect.value = currentOctaves;
-      if (instSelect) instSelect.value = currentInstrument;
-      if (bpmRange) bpmRange.value = bpm;
-      if (bpmVal) bpmVal.innerText = bpm;
+      document.getElementById('timeSigSelect').value = currentTimeSig;
+      document.getElementById('measuresSelect').value = currentMeasures;
+      document.getElementById('scaleSelect').value = currentScale;
+      document.getElementById('octaveSelect').value = currentOctaves;
+      document.getElementById('instSelect').value = currentInstrument;
+      document.getElementById('bpmRange').value = bpm;
+      document.getElementById('bpmVal').innerText = bpm;
 
       renderGrid();
       showToast(`'${song.name}' 예시곡을 불러왔습니다.`);
     }
 
-    /* OfflineAudioContext를 이용한 실제 WAV 오디오 파일 내보내기 (GitHub Pages 호환 보완) */
     async function exportToWav() {
-      try {
-        showToast("WAV 오디오 파일 생성 중...");
-        
-        // 1. HTTPS/GitHub Pages 환경 오디오 컨텍스트 강제 활성화 (보안 정책 통과)
-        const mainCtx = getAudioContext();
-        if (mainCtx.state === 'suspended') {
-          await mainCtx.resume();
-        }
-
-        const sampleRate = 44100;
-        const totalQuarterBeats = getTotalSteps();
-        const quarterDuration = 60 / bpm;
-        const totalDurationSec = totalQuarterBeats * quarterDuration + 1.5; 
-        
-        const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
-          2, 
-          Math.ceil(sampleRate * totalDurationSec), 
-          sampleRate
-        );
-
-        const activeNotes = getActiveNoteList();
-
-        // 2. 멜로디 노트 오프라인 스케줄링
-        activeNotes.forEach((n) => {
-          const rowKey = n.name;
-          if (gridData[rowKey]) {
-            Object.keys(gridData[rowKey]).forEach((stepStr) => {
-              const startStep = parseFloat(stepStr);
-              const noteData = gridData[rowKey][stepStr];
-              const startTime = startStep * quarterDuration;
-              const beatDuration = (noteData.duration || 1) * quarterDuration;
-              playNote(rowKey, beatDuration, offlineCtx, startTime);
-            });
-          }
-        });
-
-        // 3. 타악기 노트 오프라인 스케줄링
-        percTracks.forEach((pTrack) => {
-          const rowKey = `perc_${pTrack.id}`;
-          if (gridData[rowKey]) {
-            Object.keys(gridData[rowKey]).forEach((stepStr) => {
-              const startStep = parseFloat(stepStr);
-              if (gridData[rowKey][stepStr]) {
-                const startTime = startStep * quarterDuration;
-                playPercussion(pTrack.id, offlineCtx, startTime);
-              }
-            });
-          }
-        });
-
-        // 4. 오프라인 렌더링 수행 및 WAV 인코딩
-        const renderedBuffer = await offlineCtx.startRendering();
-        const wavBuffer = audioBufferToWav(renderedBuffer);
-        const blob = new Blob([wavBuffer], { type: 'audio/wav' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `garakon_${Date.now()}.wav`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast("WAV 파일 다운로드 완료!");
-      } catch (err) {
-        console.error("WAV Export Error:", err);
-        showToast("WAV 파일 생성 중 오류가 발생했습니다.");
-      }
-    }
-
-    // AudioBuffer -> RIFF WAV 변환 헬퍼 함수
-    function audioBufferToWav(buffer) {
-      const numChannels = buffer.numberOfChannels;
-      const sampleRate = buffer.sampleRate;
-      const format = 1; // PCM
-      const bitDepth = 16;
+      showToast('WAV 오디오 파일을 생성 중입니다...');
+      const secondsPerBeat = 60 / bpm;
+      const totalBeats = getTotalSteps();
+      const totalDuration = totalBeats * secondsPerBeat + 1.5;
+      const sampleRate = 44100;
       
-      let result;
-      if (numChannels === 2) {
-        const left = buffer.getChannelData(0);
-        const right = buffer.getChannelData(1);
-        result = interleave(left, right);
-      } else {
-        result = buffer.getChannelData(0);
-      }
+      const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(sampleRate * totalDuration), sampleRate);
 
-      const dataLength = result.length * 2;
-      const bufferLength = 44 + dataLength;
-      const arrayBuffer = new ArrayBuffer(bufferLength);
-      const view = new DataView(arrayBuffer);
-
-      /* RIFF identifier */
-      writeString(view, 0, 'RIFF');
-      /* RIFF chunk length */
-      view.setUint32(4, 36 + dataLength, true);
-      /* RIFF type */
-      writeString(view, 8, 'WAVE');
-      /* format chunk identifier */
-      writeString(view, 12, 'fmt ');
-      /* format chunk length */
-      view.setUint32(16, 16, true);
-      /* sample format (raw) */
-      view.setUint16(20, format, true);
-      /* channel count */
-      view.setUint16(22, numChannels, true);
-      /* sample rate */
-      view.setUint32(24, sampleRate, true);
-      /* byte rate (sample rate * block align) */
-      view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
-      /* block align (channel count * bytes per sample) */
-      view.setUint16(32, numChannels * (bitDepth / 8), true);
-      /* bits per sample */
-      view.setUint16(34, bitDepth, true);
-      /* data chunk identifier */
-      writeString(view, 36, 'data');
-      /* data chunk length */
-      view.setUint32(40, dataLength, true);
-
-      // Write PCM audio samples
-      let offset = 44;
-      for (let i = 0; i < result.length; i++, offset += 2) {
-        const s = Math.max(-1, Math.min(1, result[i]));
-        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-      }
-
-      return arrayBuffer;
-    }
-
-    function interleave(inputL, inputR) {
-      const length = inputL.length + inputR.length;
-      const result = new Float32Array(length);
-      let index = 0;
-      let inputIndex = 0;
-
-      while (index < length) {
-        result[index++] = inputL[inputIndex];
-        result[index++] = inputR[inputIndex];
-        inputIndex++;
-      }
-      return result;
-    }
-
-    function writeString(view, offset, string) {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    }
-
-    /* BandLab 호환 표준 MIDI 생성 함수 */
-    function exportToMidi() {
-      try {
-        showToast("미디 파일 내보내는 중...");
-        
-        const pitchToMidi = {
-          'C6': 84, 'B5': 83, 'A#5': 82, 'A5': 81, 'G#5': 80, 'G5': 79, 'F#5': 78, 'F5': 77, 'E5': 76, 'D#5': 75, 'D5': 74, 'C#5': 73, 'C5': 72,
-          'B4': 71, 'A#4': 70, 'A4': 69, 'G#4': 68, 'G4': 67, 'F#4': 66, 'F4': 65, 'E4': 64, 'D#4': 63, 'D4': 62, 'C#4': 61, 'C4': 60,
-          'B3': 59, 'A#3': 58, 'A3': 57, 'G#3': 56, 'G3': 55, 'F#3': 54, 'F3': 53, 'E3': 52, 'D#3': 51, 'D3': 50, 'C#3': 49, 'C3': 48,
-          'B2': 47, 'A#2': 46, 'A2': 45, 'G2': 43, 'F#2': 42, 'F2': 41, 'E2': 40, 'D2': 38, 'C#2': 37, 'C2': 36
-        };
-
-        const ticksPerQuarter = 480;
-        let events = [];
-
-        // 1. 멜로디 노트를 미디 이벤트로 추출
-        Object.keys(gridData).forEach(rowKey => {
-          if (rowKey.startsWith('perc_')) return;
-          const midiPitch = pitchToMidi[rowKey];
-          if (!midiPitch) return;
-
-          Object.keys(gridData[rowKey]).forEach(stepStr => {
-            const qStep = parseFloat(stepStr);
-            const durBeats = gridData[rowKey][stepStr].duration || 1;
-            const startTick = Math.round(qStep * ticksPerQuarter);
-            const durTicks = Math.round(durBeats * ticksPerQuarter);
-
-            events.push({ tick: startTick, type: 0x90, pitch: midiPitch, vel: 90, channel: 0 });
-            events.push({ tick: startTick + durTicks, type: 0x80, pitch: midiPitch, vel: 0, channel: 0 });
+      const activeNotes = getActiveNoteList();
+      activeNotes.forEach((n) => {
+        const rowKey = n.name;
+        if (gridData[rowKey]) {
+          Object.keys(gridData[rowKey]).forEach((subStepStr) => {
+            const subStep = parseFloat(subStepStr);
+            const startTime = subStep * secondsPerBeat;
+            const durBeats = gridData[rowKey][subStepStr].duration || 1;
+            playNote(rowKey, durBeats * secondsPerBeat, offlineCtx, startTime);
           });
-        });
-
-        // 2. 타악기 노트를 GM 표준 드럼 노트 번호로 매핑 (채널 9)
-        const percMidiPitches = { 'high': 42, 'mid': 38, 'low': 36 }; 
-        percTracks.forEach(pTrack => {
-          const rowKey = `perc_${pTrack.id}`;
-          if (gridData[rowKey]) {
-            const percPitch = percMidiPitches[pTrack.id] || 38;
-            Object.keys(gridData[rowKey]).forEach(stepStr => {
-              if (gridData[rowKey][stepStr]) {
-                const qStep = parseFloat(stepStr);
-                const startTick = Math.round(qStep * ticksPerQuarter);
-                events.push({ tick: startTick, type: 0x90, pitch: percPitch, vel: 100, channel: 9 });
-                events.push({ tick: startTick + 120, type: 0x80, pitch: percPitch, vel: 0, channel: 9 });
-              }
-            });
-          }
-        });
-
-        // 정렬: 동시 시각 처리 시 Note Off가 Note On보다 항상 우선 정렬되도록 검증
-        events.sort((a, b) => a.tick === b.tick ? a.type - b.type : a.tick - b.tick);
-
-        // 가변 길이 바이트(Variable Length Quantity) 인코더 (BandLab 호환성 검증 완료)
-        function writeVarLen(val) {
-          let buffer = [];
-          let v = val;
-          buffer.push(v & 0x7F);
-          while ((v >>= 7) > 0) {
-            buffer.push((v & 0x7F) | 0x80);
-          }
-          return buffer.reverse();
         }
+      });
 
-        let trackBytes = [];
-        const microsecondsPerBeat = Math.round(60000000 / bpm);
+      percTracks.forEach((pTrack) => {
+        const rowKey = `perc_${pTrack.id}`;
+        if (gridData[rowKey]) {
+          Object.keys(gridData[rowKey]).forEach((subStepStr) => {
+            const subStep = parseFloat(subStepStr);
+            const startTime = subStep * secondsPerBeat;
+            playPercussion(pTrack.id, offlineCtx, startTime);
+          });
+        }
+      });
 
-        // 템포 제어 데이터 헤더
-        trackBytes.push(0x00, 0xFF, 0x51, 0x03, (microsecondsPerBeat >> 16) & 0xFF, (microsecondsPerBeat >> 8) & 0xFF, microsecondsPerBeat & 0xFF);
-
-        let lastTick = 0;
-        events.forEach(e => {
-          const delta = e.tick - lastTick;
-          lastTick = e.tick;
-          trackBytes.push(...writeVarLen(delta));
-          trackBytes.push(e.type | (e.channel & 0x0F));
-          trackBytes.push(e.pitch & 0x7F);
-          trackBytes.push(e.vel & 0x7F);
-        });
-
-        // Track End 트랙 종료 헤더
-        trackBytes.push(0x00, 0xFF, 0x2F, 0x00);
-
-        // Standard MIDI Header (Format 0 Single Track)
-        const header = [
-          0x4D, 0x54, 0x68, 0x64, // MThd
-          0x00, 0x00, 0x00, 0x06, // Header Length
-          0x00, 0x00,             // Format 0
-          0x00, 0x01,             // 1 Track
-          (ticksPerQuarter >> 8) & 0xFF, ticksPerQuarter & 0xFF, // Division
-          0x4D, 0x54, 0x72, 0x6B, // MTrk
-          (trackBytes.length >> 24) & 0xFF, (trackBytes.length >> 16) & 0xFF, (trackBytes.length >> 8) & 0xFF, trackBytes.length & 0xFF
-        ];
-
-        const midiBuffer = Uint8Array.from([...header, ...trackBytes]);
-        const blob = new Blob([midiBuffer], { type: 'audio/midi' });
-        const url = URL.createObjectURL(blob);
+      try {
+        const renderedBuffer = await offlineCtx.startRendering();
+        const wavBlob = bufferToWave(renderedBuffer, renderedBuffer.length);
+        const url = URL.createObjectURL(wavBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `garakon_${Date.now()}.mid`;
+        a.download = `GarakOn_Music_${Date.now()}.wav`;
         a.click();
         URL.revokeObjectURL(url);
-        showToast(".mid 파일 다운로드 완료!");
+        showToast('WAV 오디오 다운로드가 완료되었습니다!');
       } catch (err) {
-        showToast("MIDI 파일 생성 중 오류가 발생했습니다.");
+        showToast('WAV 생성에 실패했습니다.');
       }
     }
 
-    function saveBackupJson() {
-      const exportData = {
-        title: 'GarakOn_Project',
-        timeSig: currentTimeSig,
-        measures: currentMeasures,
-        bpm: bpm,
-        gridData: gridData
-      };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    function bufferToWave(abuffer, len) {
+      let numOfChan = abuffer.numberOfChannels,
+          length = len * numOfChan * 2 + 44,
+          buffer = new ArrayBuffer(length),
+          view = new DataView(buffer),
+          channels = [], i, sample, offset = 0, pos = 0;
+
+      function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+      function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+      setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157);
+      setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
+      setUint32(abuffer.sampleRate); setUint32(abuffer.sampleRate * 2 * numOfChan);
+      setUint16(numOfChan * 2); setUint16(16);
+      setUint32(0x61746164); setUint32(length - pos - 4);
+
+      for (i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
+
+      while (pos < length) {
+        for (i = 0; i < numOfChan; i++) {
+          sample = Math.max(-1, Math.min(1, channels[i][offset]));
+          sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+          view.setInt16(pos, sample, true); pos += 2;
+        }
+        offset++;
+      }
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    /* 과거 잘 작동했던 표준 원본 구조 기반 MIDI 생성 함수 */
+    function exportToMidi() {
+      const ticksPerBeat = 480;
+      let events = [];
+
+      Object.keys(gridData).forEach((rowKey) => {
+        if (rowKey.startsWith('perc_')) return;
+        const midiPitch = midiPitchMap[rowKey];
+        if (!midiPitch) return;
+
+        Object.keys(gridData[rowKey]).forEach((stepStr) => {
+          const step = parseFloat(stepStr);
+          const dur = gridData[rowKey][stepStr].duration || 1;
+          const startTicks = Math.round(step * ticksPerBeat);
+          const endTicks = Math.round((step + dur) * ticksPerBeat);
+
+          events.push({ ticks: startTicks, type: 0x90, pitch: midiPitch, vel: 100, isOff: 0 });
+          events.push({ ticks: endTicks, type: 0x80, pitch: midiPitch, vel: 0, isOff: 1 });
+        });
+      });
+
+      events.sort((a, b) => {
+        if (a.ticks !== b.ticks) return a.ticks - b.ticks;
+        return a.isOff - b.isOff;
+      });
+
+      function writeVLQ(num) {
+        let buffer = num & 0x7F;
+        let bytes = [];
+        while (num >>= 7) {
+          buffer <<= 8;
+          buffer |= ((num & 0x7F) | 0x80);
+        }
+        while (true) {
+          bytes.push(buffer & 0xFF);
+          if (buffer & 0x80) buffer >>= 8;
+          else break;
+        }
+        return bytes;
+      }
+
+      let trackBytes = [];
+      let lastTicks = 0;
+
+      // Tempo Event Set (120 BPM 기준 마이크로초 변환)
+      const mpqn = Math.round(60000000 / bpm);
+      trackBytes.push(0x00, 0xFF, 0x51, 0x03, (mpqn >> 16) & 0xFF, (mpqn >> 8) & 0xFF, mpqn & 0xFF);
+
+      events.forEach(evt => {
+        const delta = evt.ticks - lastTicks;
+        lastTicks = evt.ticks;
+        trackBytes.push(...writeVLQ(delta));
+        trackBytes.push(evt.type, evt.pitch, evt.vel);
+      });
+
+      // End of Track Meta Event
+      trackBytes.push(0x00, 0xFF, 0x2F, 0x00);
+
+      // MThd Header
+      const header = [
+        0x4D, 0x54, 0x68, 0x64, // 'MThd'
+        0x00, 0x00, 0x00, 0x06, // Length: 6
+        0x00, 0x00,             // Format 0
+        0x00, 0x01,             // Tracks: 1
+        (ticksPerBeat >> 8) & 0xFF, ticksPerBeat & 0xFF
+      ];
+
+      // MTrk Header
+      const len = trackBytes.length;
+      const trackHeader = [
+        0x4D, 0x54, 0x72, 0x6B, // 'MTrk'
+        (len >> 24) & 0xFF,
+        (len >> 16) & 0xFF,
+        (len >> 8) & 0xFF,
+        len & 0xFF
+      ];
+
+      const fullFile = new Uint8Array([...header, ...trackHeader, ...trackBytes]);
+      const blob = new Blob([fullFile], { type: 'audio/midi' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'garakon_music.garakon';
+      a.download = `garakon_${Date.now()}.mid`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('백업 파일(.garakon)이 저장되었습니다.');
+      showToast('MIDI 파일이 정상 생성되었습니다!');
     }
 
-    function loadBackupJson(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const loaded = JSON.parse(evt.target.result);
-          if (loaded.gridData) {
-            gridData = loaded.gridData;
-            if (loaded.timeSig) currentTimeSig = loaded.timeSig;
-            if (loaded.measures) currentMeasures = loaded.measures;
-            if (loaded.bpm) bpm = loaded.bpm;
-
-            const timeSigSelect = document.getElementById('timeSigSelect');
-            const measuresSelect = document.getElementById('measuresSelect');
-            const bpmRange = document.getElementById('bpmRange');
-            const bpmVal = document.getElementById('bpmVal');
-
-            if (timeSigSelect) timeSigSelect.value = currentTimeSig;
-            if (measuresSelect) measuresSelect.value = currentMeasures;
-            if (bpmRange) bpmRange.value = bpm;
-            if (bpmVal) bpmVal.innerText = bpm;
-
-            renderGrid();
-            showToast('백업 파일을 성공적으로 불러왔습니다.');
-          }
-        } catch (err) {
-          showToast('올바른 백업 파일이 아닙니다.');
-        }
-      };
-      reader.readAsText(file);
+    function saveProjectJson() {
+      const dataObj = { timeSig: currentTimeSig, measures: currentMeasures, bpm: bpm, scale: currentScale, octaves: currentOctaves, inst: currentInstrument, gridData: gridData };
+      const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `GarakOn_Project_${Date.now()}.garakon`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('가락온 프로젝트가 백업 파일로 저장되었습니다.');
     }
 
-    function shareUrlLink() {
+    function shareProjectUrl() {
       updateUrlHash();
-      const stateObj = {
-        timeSig: currentTimeSig,
-        measures: currentMeasures,
-        bpm: bpm,
-        scale: currentScale,
-        octaves: currentOctaves,
-        inst: currentInstrument,
-        gridData: gridData
-      };
-      const jsonStr = JSON.stringify(stateObj);
-      const encodedData = encodeURIComponent(jsonStr);
-      
-      const fullShareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fullShareUrl).then(() => {
-          showToast('음악 정보가 담긴 공유 링크가 클립보드에 복사되었습니다.');
-        }).catch(() => {
-          fallbackCopyTextToClipboard(fullShareUrl);
-        });
-      } else {
-        fallbackCopyTextToClipboard(fullShareUrl);
-      }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-      const dummy = document.createElement('input');
-      document.body.appendChild(dummy);
-      dummy.value = text;
-      dummy.select();
-      document.execCommand('copy');
-      document.body.removeChild(dummy);
-      showToast('음악 정보가 담긴 공유 링크가 클립보드에 복사되었습니다.');
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('공유 링크가 클립보드에 복사되었습니다!');
+      }).catch(() => {
+        showToast('클립보드 복사에 실패했습니다.');
+      });
     }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
       if (!toast || !toastMsg) return;
-
       toastMsg.innerText = msg;
       toast.classList.remove('opacity-0', 'pointer-events-none');
       toast.classList.add('opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2500);
+      setTimeout(() => { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0', 'pointer-events-none'); }, 2500);
     }
 
     function safeAddListener(id, event, handler) {
@@ -2120,180 +1509,122 @@
           document.querySelectorAll('.dur-btn').forEach((b) => {
             b.classList.remove('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
             b.classList.add('text-slate-600');
-            const subSvgContainer = b.querySelector('div svg');
-            if (subSvgContainer) {
-              b.querySelectorAll('svg').forEach(s => {
-                s.classList.replace('text-amber-300', 'text-amber-600');
-              });
-            }
+            b.querySelectorAll('svg').forEach(s => s.classList.replace('text-amber-300', 'text-amber-600'));
           });
           btn.classList.add('active-dur', 'bg-emerald-600', 'text-white', 'shadow-2xs');
           btn.classList.remove('text-slate-600');
-          btn.querySelectorAll('svg').forEach(s => {
-            s.classList.replace('text-amber-600', 'text-amber-300');
-          });
+          btn.querySelectorAll('svg').forEach(s => s.classList.replace('text-amber-600', 'text-amber-300'));
           selectedDuration = parseFloat(btn.dataset.dur);
         });
       });
 
       window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-          const activeElem = document.activeElement;
-          if (activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'SELECT' || activeElem.tagName === 'TEXTAREA')) {
-            return;
-          }
-          e.preventDefault();
-          if (isPlaying) stopPlayback();
-          else startPlayback();
-        }
+        const activeElem = document.activeElement;
+        if (activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'SELECT' || activeElem.tagName === 'TEXTAREA')) return;
+        if (e.code === 'Space') { e.preventDefault(); if (isPlaying) stopPlayback(); else startPlayback(); }
+        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
       });
 
-      safeAddListener('playBtn', 'click', () => {
-        if (isPlaying) stopPlayback();
-        else startPlayback();
-      });
-
+      safeAddListener('playBtn', 'click', () => { if (isPlaying) stopPlayback(); else startPlayback(); });
       safeAddListener('stopBtn', 'click', stopPlayback);
+      safeAddListener('undoBtn', 'click', undo);
+      safeAddListener('redoBtn', 'click', redo);
 
       safeAddListener('loopToggleBtn', 'click', () => {
         isLooping = !isLooping;
         const loopBtn = document.getElementById('loopToggleBtn');
         const loopIcon = document.getElementById('loopIcon');
-
         if (isLooping) {
           loopBtn.classList.replace('bg-slate-100', 'bg-emerald-100');
           loopBtn.classList.replace('text-slate-700', 'text-emerald-800');
-          loopBtn.classList.replace('border-slate-200', 'border-emerald-300');
-          if (loopIcon) {
-            loopIcon.classList.replace('fa-rotate-right', 'fa-repeat');
-            loopIcon.classList.replace('text-slate-500', 'text-emerald-700');
-          }
+          if (loopIcon) loopIcon.classList.replace('text-slate-500', 'text-emerald-700');
           showToast('연속 반복 재생 모드로 설정되었습니다.');
         } else {
           loopBtn.classList.replace('bg-emerald-100', 'bg-slate-100');
           loopBtn.classList.replace('text-emerald-800', 'text-slate-700');
-          loopBtn.classList.replace('border-emerald-300', 'border-slate-200');
-          if (loopIcon) {
-            loopIcon.classList.replace('fa-repeat', 'fa-rotate-right');
-            loopIcon.classList.replace('text-emerald-700', 'text-slate-500');
-          }
+          if (loopIcon) loopIcon.classList.replace('text-emerald-700', 'text-slate-500');
           showToast('1회 재생 모드로 설정되었습니다.');
         }
       });
 
-      safeAddListener('clearBtn', 'click', () => {
-        gridData = {};
-        renderGrid();
-        showToast('악보가 깨끗이 지워졌습니다.');
-      });
-
-      safeAddListener('instSelect', 'change', (e) => {
-        currentInstrument = e.target.value;
-        updateUrlHash();
-      });
-      safeAddListener('scaleSelect', 'change', (e) => {
-        currentScale = e.target.value;
-        renderGrid();
-      });
-      safeAddListener('octaveSelect', 'change', (e) => {
-        currentOctaves = parseInt(e.target.value);
-        renderGrid();
-      });
-      safeAddListener('timeSigSelect', 'change', (e) => {
-        currentTimeSig = e.target.value;
-        renderGrid();
-      });
-      safeAddListener('measuresSelect', 'change', (e) => {
-        currentMeasures = parseInt(e.target.value);
-        renderGrid();
-      });
-      safeAddListener('bpmRange', 'input', (e) => {
-        bpm = parseInt(e.target.value);
-        const bpmVal = document.getElementById('bpmVal');
-        if (bpmVal) bpmVal.innerText = bpm;
-        updateUrlHash();
-        if (isPlaying) {
-          stopPlayback();
-          startPlayback();
-        }
-      });
+      safeAddListener('clearBtn', 'click', () => { saveStateForUndo(); gridData = {}; renderGrid(); showToast('악보가 깨끗이 지워졌습니다.'); });
+      safeAddListener('instSelect', 'change', (e) => { currentInstrument = e.target.value; updateUrlHash(); });
+      safeAddListener('scaleSelect', 'change', (e) => { currentScale = e.target.value; renderGrid(); });
+      safeAddListener('octaveSelect', 'change', (e) => { currentOctaves = parseInt(e.target.value); renderGrid(); });
+      safeAddListener('timeSigSelect', 'change', (e) => { currentTimeSig = e.target.value; renderGrid(); });
+      safeAddListener('measuresSelect', 'change', (e) => { currentMeasures = parseInt(e.target.value); renderGrid(); });
+      safeAddListener('bpmRange', 'input', (e) => { bpm = parseInt(e.target.value); document.getElementById('bpmVal').innerText = bpm; updateUrlHash(); if (isPlaying) { stopPlayback(); startPlayback(); } });
 
       const sampleBtn = document.getElementById('sampleBtn');
       const sampleMenu = document.getElementById('sampleMenu');
       if (sampleBtn && sampleMenu) {
-        sampleBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (exportMenu) exportMenu.classList.add('hidden');
-          sampleMenu.classList.toggle('hidden');
-        });
-        sampleMenu.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-song]');
-          if (btn) {
-            loadSampleSong(btn.dataset.song);
-            sampleMenu.classList.add('hidden');
-          }
-        });
+        sampleBtn.addEventListener('click', (e) => { e.stopPropagation(); sampleMenu.classList.toggle('hidden'); });
+        sampleMenu.addEventListener('click', (e) => { const btn = e.target.closest('[data-song]'); if (btn) { loadSampleSong(btn.dataset.song); sampleMenu.classList.add('hidden'); } });
       }
 
       const exportBtn = document.getElementById('exportBtn');
       const exportMenu = document.getElementById('exportMenu');
       if (exportBtn && exportMenu) {
-        exportBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (sampleMenu) sampleMenu.classList.add('hidden');
-          exportMenu.classList.toggle('hidden');
+        exportBtn.addEventListener('click', (e) => { e.stopPropagation(); exportMenu.classList.toggle('hidden'); });
+      }
+
+      safeAddListener('exportWav', 'click', exportToWav);
+      safeAddListener('exportMidi', 'click', exportToMidi);
+      safeAddListener('saveJson', 'click', saveProjectJson);
+      safeAddListener('shareUrl', 'click', shareProjectUrl);
+
+      const jsonInput = document.getElementById('jsonInput');
+      safeAddListener('loadJson', 'click', () => { if (jsonInput) jsonInput.click(); });
+      if (jsonInput) {
+        jsonInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            try {
+              const loaded = JSON.parse(evt.target.result);
+              if (loaded && loaded.gridData) {
+                saveStateForUndo();
+                gridData = loaded.gridData;
+                if (loaded.timeSig) currentTimeSig = loaded.timeSig;
+                if (loaded.measures) currentMeasures = loaded.measures;
+                if (loaded.bpm) bpm = loaded.bpm;
+                if (loaded.scale) currentScale = loaded.scale;
+                if (loaded.octaves) currentOctaves = loaded.octaves;
+                if (loaded.inst) currentInstrument = loaded.inst;
+
+                document.getElementById('timeSigSelect').value = currentTimeSig;
+                document.getElementById('measuresSelect').value = currentMeasures;
+                document.getElementById('scaleSelect').value = currentScale;
+                document.getElementById('octaveSelect').value = currentOctaves;
+                document.getElementById('instSelect').value = currentInstrument;
+                document.getElementById('bpmRange').value = bpm;
+                document.getElementById('bpmVal').innerText = bpm;
+
+                renderGrid();
+                showToast('프로젝트 파일을 성공적으로 불러왔습니다.');
+              }
+            } catch (err) {
+              showToast('유효하지 않은 프로젝트 파일입니다.');
+            }
+          };
+          reader.readAsText(file);
         });
       }
 
-      document.addEventListener('click', (e) => {
-        if (sampleMenu && !sampleMenu.contains(e.target) && e.target !== sampleBtn) {
-          sampleMenu.classList.add('hidden');
-        }
-        if (exportMenu && !exportMenu.contains(e.target) && e.target !== exportBtn) {
-          exportMenu.classList.add('hidden');
-        }
+      document.addEventListener('click', () => {
+        if (sampleMenu) sampleMenu.classList.add('hidden');
+        if (exportMenu) exportMenu.classList.add('hidden');
       });
-
-      safeAddListener('exportWav', 'click', () => { exportToWav(); if (exportMenu) exportMenu.classList.add('hidden'); });
-      safeAddListener('exportMidi', 'click', () => { exportToMidi(); if (exportMenu) exportMenu.classList.add('hidden'); });
-      safeAddListener('saveJson', 'click', () => { saveBackupJson(); if (exportMenu) exportMenu.classList.add('hidden'); });
-      safeAddListener('loadJson', 'click', () => { 
-        const jsonInput = document.getElementById('jsonInput');
-        if (jsonInput) jsonInput.click(); 
-        if (exportMenu) exportMenu.classList.add('hidden'); 
-      });
-      safeAddListener('jsonInput', 'change', loadBackupJson);
-      safeAddListener('shareUrl', 'click', () => { shareUrlLink(); if (exportMenu) exportMenu.classList.add('hidden'); });
-
-      const mobileSettingsToggleBtn = document.getElementById('mobileSettingsToggleBtn');
-      const controlsToolbar = document.getElementById('controlsToolbar');
-      if (mobileSettingsToggleBtn && controlsToolbar) {
-        mobileSettingsToggleBtn.addEventListener('click', () => {
-          controlsToolbar.classList.toggle('hidden');
-        });
-      }
 
       const sheetMusicModal = document.getElementById('sheetMusicModal');
-      safeAddListener('sheetMusicBtn', 'click', () => {
-        if (sheetMusicModal) {
-          sheetMusicModal.classList.remove('hidden');
-          renderSheetMusic();
-        }
-      });
+      safeAddListener('sheetMusicBtn', 'click', () => { if (sheetMusicModal) { sheetMusicModal.classList.remove('hidden'); renderSheetMusic(); } });
+      safeAddListener('closeSheetBtn', 'click', () => { if (sheetMusicModal) sheetMusicModal.classList.add('hidden'); });
+      safeAddListener('printSheetBtn', 'click', () => { window.print(); });
 
-      safeAddListener('closeSheetBtn', 'click', () => {
-        if (sheetMusicModal) sheetMusicModal.classList.add('hidden');
-      });
-
-      safeAddListener('printSheetBtn', 'click', () => {
-        window.print();
-      });
-
-      const loadedFromUrl = loadStateFromUrl();
+      loadStateFromUrl();
       renderGrid();
-      if (loadedFromUrl) {
-        showToast('공유받은 음악 데이터를 불러왔습니다.');
-      }
     });
   </script>
 </body>
